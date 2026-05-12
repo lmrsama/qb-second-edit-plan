@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <!-- mobile-readability-v5.5 build:20260512-221600 realtime-sync -->
+    <!-- mobile-readability-v5.6 build:20260512-223600 fab-poll-init-dialog -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
@@ -187,7 +187,15 @@
 
         /* 全局评论FAB：有评论时加红点 */
         #globalCommentFab.has-comments::after { content: none; }
-        #globalCommentFab:hover { transform: scale(1.08); box-shadow: 0 6px 20px rgba(102,126,234,0.5); }
+        #globalCommentFab:hover { transform: scale(1.08); box-shadow: 0 6px 20px rgba(0,82,217,0.5); }
+        /* v5.6：手机视图下 FAB 避开 home indicator + 提高对比 */
+        body.mobile-view #globalCommentFab {
+            bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+            right: 16px;
+            width: 50px; height: 50px;
+            font-size: 22px;
+            z-index: 1500;
+        }
 
         body.mobile-view .container { max-width: 420px; padding: 0 10px; }
         body.mobile-view .flow-row { flex-direction: column; gap: 20px; }
@@ -1301,7 +1309,7 @@
 
     <!-- 右下角悬浮：评论入口 -->
     <button id="globalCommentFab" onclick="openPanel({kind:'all'})" title="评论中心"
-        style="position:fixed;bottom:24px;right:24px;width:52px;height:52px;border-radius:50%;background:#667eea;color:white;border:none;font-size:22px;cursor:pointer;box-shadow:0 4px 16px rgba(102,126,234,0.4);z-index:998;display:flex;align-items:center;justify-content:center;transition:all 0.2s;">💬</button>
+        style="position:fixed;bottom:24px;right:24px;width:54px;height:54px;border-radius:50%;background:#0052D9;color:white;border:none;font-size:24px;cursor:pointer;box-shadow:0 6px 18px rgba(0,82,217,0.45);z-index:1500;display:flex;align-items:center;justify-content:center;transition:all 0.2s;">💬</button>
 
     <!-- v2.11 浮动小工具栏 + inline 输入 + 顶部 toast -->
     <div id="bubbleToolbar">
@@ -2258,7 +2266,7 @@
         const WORKER_BASE = 'https://1406195631-ft345q04pn.ap-guangzhou.tencentscf.com';
 
         // 仅 AI 改稿密钥（deepseek API key）保留密码加密存储——deepseek key 暴露不会被自动 revoke
-        const ENCRYPTED_KEYS = 'u9g2QeXb6e3lcPqt4x6bo74fZIBmRgh6XnuxSr2gMJE1zb6TMrqWUdjSeFNrYOkUiSXJ2yi64R+J2xLMYc5H9A97w6z5rKAm9nB4K6I6as1OCl1i+j4=';
+        const ENCRYPTED_KEYS = '5ToFtWOSeNIW0kmAR69CqYcQGkibGK4NfNLdLvLfnPZrDiPy+u1uRwhqvfXGf+mwggdLkWa3habVI7bf5iXT3MGPuSmIr1oybKlsdeCfOQYLtsOk64s=';
 
         let _cachedKeys = null;
         async function ensureKeys() {
@@ -2352,30 +2360,115 @@
         function getNickname() {
             return localStorage.getItem('comment_author') || '';
         }
+
+        // v5.6：首次进站合并弹窗（昵称 + 密码一次填完）。
+        // 已经填过昵称就跳过；密码每个 session 走 sessionStorage（关闭浏览器要重输）。
+        function showInitDialog() {
+            return new Promise(resolve => {
+                const existing = document.getElementById('initDialog');
+                if (existing) existing.remove();
+                const el = document.createElement('div');
+                el.id = 'initDialog';
+                el.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:99999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(3px);';
+                el.innerHTML = `
+                    <div style="background:white;padding:26px 24px 22px;border-radius:14px;width:88%;max-width:380px;box-sizing:border-box;box-shadow:0 12px 40px rgba(0,0,0,0.25);">
+                        <div style="font-size:18px;font-weight:700;margin-bottom:6px;color:#0052D9;">👋 欢迎，先报个家门</div>
+                        <div style="font-size:12.5px;color:#666;margin-bottom:18px;line-height:1.6;">为了让作者能看到是谁的评论 + 防止外人乱写，需要昵称 + 密码各一次（本机记住）。</div>
+                        <label style="display:block;font-size:12.5px;color:#374151;font-weight:600;margin-bottom:6px;">昵称</label>
+                        <input id="initNick" type="text" placeholder="如：汉博 / Leo" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:16px;outline:none;margin-bottom:14px;">
+                        <label style="display:block;font-size:12.5px;color:#374151;font-weight:600;margin-bottom:6px;">写权限密码</label>
+                        <input id="initPwd" type="password" placeholder="向作者索取" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:16px;outline:none;margin-bottom:6px;">
+                        <div id="initErr" style="font-size:12px;color:#dc2626;min-height:16px;margin-bottom:8px;"></div>
+                        <div style="display:flex;justify-content:flex-end;gap:8px;">
+                            <button id="initOk" style="background:#0052D9;color:white;border:none;padding:9px 20px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;">进入</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(el);
+                const nickInput = el.querySelector('#initNick');
+                const pwdInput = el.querySelector('#initPwd');
+                const errEl = el.querySelector('#initErr');
+                // 预填已存在的昵称
+                const savedNick = getNickname();
+                if (savedNick) nickInput.value = savedNick;
+                // 预填本会话密码
+                const savedPwd = sessionStorage.getItem('_qbpw');
+                if (savedPwd) pwdInput.value = savedPwd;
+                setTimeout(() => (savedNick ? pwdInput : nickInput).focus(), 50);
+
+                const submit = async () => {
+                    const nick = (nickInput.value || '').trim();
+                    const pwd  = (pwdInput.value  || '').trim();
+                    if (!nick) { errEl.textContent = '请填昵称'; nickInput.focus(); return; }
+                    if (!pwd)  { errEl.textContent = '请填密码'; pwdInput.focus(); return; }
+                    errEl.textContent = '验证密码中…';
+                    // 真校验：用一次最小写探测——重写当前 comments.json 为它自己，密码错会 401
+                    try {
+                        if (typeof gistGetFileContent === 'function') {
+                            const cur = await gistGetFileContent('comments.json').catch(() => '{}');
+                            const probe = await fetch(`${WORKER_BASE}/gist/file`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ password: pwd, nickname: nick, filename: 'comments.json', content: cur || '{}' })
+                            });
+                            if (probe.status === 401) { errEl.textContent = '密码错误'; pwdInput.focus(); return; }
+                            if (!probe.ok) {
+                                const t = await probe.text().catch(() => '');
+                                // 422 可能是其它 validation 错（比如 nickname 太短），单独提示
+                                errEl.textContent = '校验失败：' + t.slice(0, 80);
+                                return;
+                            }
+                        }
+                    } catch (e) {
+                        errEl.textContent = '网络异常，请重试：' + (e && e.message || '');
+                        return;
+                    }
+                    localStorage.setItem('comment_author', nick.slice(0, 30));
+                    sessionStorage.setItem('_qbpw', pwd);
+                    el.remove();
+                    resolve({ nickname: nick, password: pwd });
+                };
+                el.querySelector('#initOk').onclick = (e) => { e.preventDefault(); e.stopPropagation(); submit(); };
+                const onKey = (e) => { if (e.key === 'Enter') { e.preventDefault(); submit(); } };
+                nickInput.addEventListener('keydown', onKey);
+                pwdInput.addEventListener('keydown', onKey);
+            });
+        }
+
+        // 首次进站：如果还没填过昵称 + 密码，直接弹合并弹窗（异步，不阻塞页面渲染）
+        // 已填过的不再弹；后续点元素/打开评论中心走缓存命中，不会重复弹。
+        (function initAuthOnce() {
+            // 等 DOM 准备好（确保 WORKER_BASE 等常量都定义了）
+            const tryRun = () => {
+                const nick = getNickname();
+                const pwd  = sessionStorage.getItem('_qbpw');
+                if (nick && pwd) return; // 都齐了不弹
+                // 已经在某个 dialog 里就不打扰
+                if (document.getElementById('initDialog') || document.getElementById('inputDialog') || document.getElementById('pwdDialog')) return;
+                showInitDialog().catch(() => {});
+            };
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => setTimeout(tryRun, 400));
+            } else {
+                setTimeout(tryRun, 400);
+            }
+        })();
+
         async function ensureNickname() {
             let name = getNickname();
             if (name) return name;
-            name = await showInputDialog('👋 请输入您的昵称', '昵称会显示在评论里，方便老板知道是谁说的（仅本机记忆）', '如：汉博 / Leo');
-            if (!name || !name.trim()) return null;
-            name = name.trim().slice(0, 30);
-            localStorage.setItem('comment_author', name);
-            return name;
+            // v5.6：未填过 → 走合并弹窗（顺便把密码也收了）
+            const r = await showInitDialog();
+            if (!r) return null;
+            return r.nickname;
         }
         async function ensureWritePassword(forcePrompt) {
             let pwd = sessionStorage.getItem('_qbpw');
             if (pwd && !forcePrompt) return pwd;
-            for (let attempt = 0; attempt < 3; attempt++) {
-                pwd = await showPasswordDialog(
-                    attempt === 0 ? '🔒 需要写权限密码' : '🔒 密码错误，请重试',
-                    '本汇报开放评论需要密码，请向页面作者索取'
-                );
-                if (!pwd) return null;
-                // 探测一次（用一个最小的不修改任何文件的写探测：filename=comments.json + 与现有内容相同的 content）
-                // 简化处理：直接缓存，让真正的写请求自己 401 时再清缓存重弹
-                sessionStorage.setItem('_qbpw', pwd);
-                return pwd;
-            }
-            return null;
+            // v5.6：缺密码 → 走合并弹窗
+            const r = await showInitDialog();
+            if (!r) return null;
+            return r.password;
         }
         function clearWritePassword() {
             sessionStorage.removeItem('_qbpw');
@@ -2796,6 +2889,9 @@
             switchPanelTab(initialTab || 'comment');
             // 静默尝试加载已缓存的密钥（不弹密码框）
             await ensureKeys();
+            // v5.6：每次开评论中心都强制拉一次最新（不依赖 8s 轮询窗口）
+            _lastCommentSig = '';
+            try { await pollComments('open-panel'); } catch(_) {}
             await renderComments();
         }
 
@@ -3405,7 +3501,9 @@
                 setTimeout(() => _positionMobileQuickInput(targetEl), 350);
             }, 50);
 
-            // 异步加载该元素已有评论
+            // 异步加载该元素已有评论（v5.6：每次点元素都强制拉一次最新）
+            _lastCommentSig = '';
+            try { await pollComments('mobile-pick'); } catch(_) {}
             _renderMqiList();
         }
 
@@ -4190,7 +4288,7 @@
         //   - 展示评论态 → 单击元素=选中（圆点+小气泡），点空白取消
         document.addEventListener('click', (e) => {
             // v2.12.1：模态弹窗（密码框、昵称框）优先 return，绝不走选区逻辑
-            if (e.target.closest('#pwdDialog, #inputDialog')) return;
+            if (e.target.closest('#pwdDialog, #inputDialog, #initDialog')) return;
             // v2.11：浮动小气泡和输入框点击优先 return，绝不走选区逻辑
             if (e.target.closest('#bubbleToolbar, #bubbleInput, #topToast, #mobileCommentCard, #mobileQuickInput')) return;
             const showComments = document.body.classList.contains('show-comments');
@@ -4381,7 +4479,7 @@
         document.addEventListener('click', (e) => {
             if (!isInSelectionMode()) return;
             // v2.12.1：模态弹窗（密码框、昵称框）优先 return
-            if (e.target.closest('#pwdDialog, #inputDialog')) return;
+            if (e.target.closest('#pwdDialog, #inputDialog, #initDialog')) return;
             // 点 评论面板 / FAB / 版本modal / 顶部按钮 / commentable 元素 / v2.11 浮层 都不算空白
             if (e.target.closest('#commentPanel, #globalCommentFab, #versionModal, #toggleCommentVisBtn, #helpBtn, #helpModal, #bubbleToolbar, #bubbleInput, #topToast, #mobileCommentCard, #mobileQuickInput')) return;
             if (e.target.closest('.commentable-text, .commentable-image, .commentable-data')) return;
