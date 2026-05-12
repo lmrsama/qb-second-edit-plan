@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <!-- mobile-readability-v5.4 build:20260512-220500 mobile-list-from-gist -->
+    <!-- mobile-readability-v5.5 build:20260512-221600 realtime-sync -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
@@ -2258,7 +2258,7 @@
         const WORKER_BASE = 'https://1406195631-ft345q04pn.ap-guangzhou.tencentscf.com';
 
         // 仅 AI 改稿密钥（deepseek API key）保留密码加密存储——deepseek key 暴露不会被自动 revoke
-        const ENCRYPTED_KEYS = 'UNalig2fdPj9/Y+U+gGdp9WNBhqS++li8DH3ohDRUojJ2Ro9/o07IGYbswZDfDqNvoNcUDttX317BUX+l9gI67rnDAQTpJnqEEV44JVRpXPwQRr+H3Q=';
+        const ENCRYPTED_KEYS = 'u9g2QeXb6e3lcPqt4x6bo74fZIBmRgh6XnuxSr2gMJE1zb6TMrqWUdjSeFNrYOkUiSXJ2yi64R+J2xLMYc5H9A97w6z5rKAm9nB4K6I6as1OCl1i+j4=';
 
         let _cachedKeys = null;
         async function ensureKeys() {
@@ -2669,6 +2669,10 @@
             // 用户手动切的才记忆，自动识别不写 localStorage
             if (!fromAuto) {
                 localStorage.setItem('view_pref', v);
+            }
+            // v5.5：切视图后立即拉一次评论（确保新视图徽标/列表是最新的）
+            if (typeof pollComments === 'function') {
+                pollComments('view-change');
             }
         }
 
@@ -3527,6 +3531,8 @@
                 input.value = '';
                 await renderComments();
                 await renderBadges();
+                // v5.5：写完后强制 invalidate 签名，下次 poll 一定走渲染分支（双保险）
+                _lastCommentSig = '';
 
                 if (useAI) {
                     try {
@@ -4406,34 +4412,50 @@
         renderBadges();
 
         // v2.11.26：评论实时同步——双保险机制
-        // 1) 30 秒轮询：拉云端最新评论，与本地比对，有新增就重渲染徽标
-        // 2) 提交后 5 秒回拉确认：addComment 末尾会 setTimeout 5s 后再拉一次（在 addComment 修改）
+        // 1) 8 秒轮询：拉云端最新评论，与本地比对，有新增就重渲染徽标 + 当前打开的手机气泡列表
+        // 2) 提交后立即拉一次（addComment 末尾会调 pollComments('after-submit')）
         // 3) 页面切换可见性时立即拉一次（避免长时间挂起后看到旧数据）
         let _lastCommentSig = '';
         async function pollComments(reason) {
             try {
                 const data = await loadFromCloud();
                 const all = (data && data.all) || [];
-                // 用 length + 最后一条 id/time 当签名，比对就行
                 const last = all.length ? all[all.length - 1] : null;
                 const sig = all.length + ':' + (last ? (last.id || last.time || '') : '');
-                if (sig !== _lastCommentSig) {
+                const force = (reason === 'after-submit' || reason === 'manual');
+                if (sig !== _lastCommentSig || force) {
                     _lastCommentSig = sig;
                     if (reason !== 'init') {
                         console.log('[poll] 评论变化（' + reason + '），重新渲染', all.length, '条');
                     }
                     await renderBadges();
+                    // v5.5：如果 PC 侧边面板正在显示，也刷新它的列表
+                    try {
+                        const panel = document.getElementById('commentPanel');
+                        if (panel && panel.classList.contains('open') && typeof renderComments === 'function') {
+                            await renderComments();
+                        }
+                    } catch (_) {}
+                    // v5.5：如果手机气泡正在显示，也刷新里面的评论列表
+                    try {
+                        const qi = document.getElementById('mobileQuickInput');
+                        if (qi && qi.classList.contains('show') && typeof _renderMqiList === 'function') {
+                            await _renderMqiList();
+                        }
+                    } catch (_) {}
                 }
             } catch (e) { console.warn('[poll] 失败', e); }
         }
         // 初始 sig
         pollComments('init');
-        // 30 秒轮询
-        setInterval(() => pollComments('interval'), 30000);
+        // v5.5：8 秒轮询（之前是 30 秒，跨设备实时性太差）
+        setInterval(() => pollComments('interval'), 8000);
         // visibility 切回前台立即拉
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden) pollComments('visible');
         });
+        // v5.5：window focus 时也拉一次（手机端从其他 app 切回会触发）
+        window.addEventListener('focus', () => pollComments('focus'));
 
         // 启动时从云端拉取 latest snapshot（AI 修改后的当前最新 DOM）
         // v2.12.0：经 Worker 公开读
