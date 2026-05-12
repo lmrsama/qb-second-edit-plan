@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <!-- mobile-readability-v5.7 build:20260512-225300 unstick-pillar-side -->
+    <!-- mobile-readability-v5.8 build:20260512-231000 feedback-iter -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
@@ -1358,7 +1358,7 @@
   <h1>浏览器 AI<br/>看改一体<span>工作台</span></h1>
   <p class="cover-sub">
     在 AI 时代，让浏览器成为任何格式内容的"展示-编辑-交付"统一工作台。<br/>
-    展示是默认态，编辑是临时召唤的状态，AI 是能力上限不是产品中心。
+    用户进来先看，需要改时再召唤编辑；AI 帮你改得更快更好，但产品骨架不绑定 AI——模型迭代，框架立得住。
   </p>
 </section>
 
@@ -1710,10 +1710,10 @@
     <div class="statement-text">
       让浏览器成为任何格式内容<br/>
       <span class="k">"展示 → 编辑 → 交付"</span>的统一工作台<br/>
-      <span style="font-size: 22px; opacity: .9;">展示是默认态 · 编辑是临时召唤的状态 · AI 是能力上限</span>
+      <span style="font-size: 22px; opacity: .9;">先看，需要时再改；AI 只是加速器</span>
     </div>
     <div class="statement-foot">
-      AI 不在产品中心。模型怎么变，这个工作台都立得住。
+      产品骨架不绑定 AI 模型——模型怎么迭代，这个工作台都立得住。
     </div>
   </div>
 </section>
@@ -2158,8 +2158,8 @@
 <section class="soft commentable" data-section="4">
   <div class="sec-head">
     <span class="sec-num">4　RESOURCES</span>
-    <h2 class="sec-title">方案我来定，这 7 项资源需要协调到位</h2>
-    <p class="sec-sub">按环节归属列出，缺哪项哪根环节立不起来。</p>
+    <h2 class="sec-title">需要协调的 7 项资源（方案外的依赖项）</h2>
+    <p class="sec-sub">这些资源不是"我能内部搞定"的——按环节归属列出，缺哪项，对应环节立不起来。</p>
   </div>
 
   <table class="res-table">
@@ -2214,8 +2214,8 @@
 <section class="commentable" data-section="5">
   <div class="sec-head">
     <span class="sec-num">5　SELF-CHECK</span>
-    <h2 class="sec-title">用 4 个极端假设压一遍，方案都立得住</h2>
-    <p class="sec-sub">AI 升级 10 倍、AI 下线、抽取同学对接、汉博转述给别人——四种情况下，这套方案都不该垮。</p>
+    <h2 class="sec-title">压力测试：4 个最容易让方案翻车的场景</h2>
+    <p class="sec-sub">提前自问：模型升级、模型下线、对接抽取同学、汉博转述给别人——哪一种会让这套方案立不住。</p>
   </div>
 
   <div class="check-grid">
@@ -2270,7 +2270,7 @@
         const WORKER_BASE = 'https://1406195631-ft345q04pn.ap-guangzhou.tencentscf.com';
 
         // 仅 AI 改稿密钥（deepseek API key）保留密码加密存储——deepseek key 暴露不会被自动 revoke
-        const ENCRYPTED_KEYS = '+IoaHFBs6DReCy3Vfc40UCGIbHnQM96TsbEWt7OoFAbqPV8c6IVh/FMjzEWAE+s+kOBhCozqT0CgOpZSyNscnKVdGdrMnddgTo2jf4Cj1e+ecTM/Y8A=';
+        const ENCRYPTED_KEYS = 'cr65LINsPwwxps5N/SHy1UVtV64XOaUVROfd9kpnTswOcyQtQfXs4dRRUO1Eyf9tboVxdFR82jqZ3XeNuKON6T2I9xZB5CSMknyMsPzWmvedrbXMrZg=';
 
         let _cachedKeys = null;
         async function ensureKeys() {
