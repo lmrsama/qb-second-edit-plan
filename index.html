@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <!-- mobile-readability-v3 build:20260512-203056 -->
+    <!-- mobile-readability-v4 build:20260512-203500 fix-flex-shrink-collapse -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
@@ -309,6 +309,47 @@
         body.mobile-view .lesson-card h3,
         body.mobile-view .check-card h3,
         body.mobile-view .phase-main h3 { font-size: 16px !important; }
+
+        /* —— 关键修复：lesson-head 是 flex row，会把 title 挤竖排，改纵向 —— */
+        body.mobile-view .lesson-head {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 8px !important;
+        }
+        body.mobile-view .lesson-title {
+            font-size: 16px !important;
+            line-height: 1.5 !important;
+            word-break: break-word; overflow-wrap: anywhere;
+        }
+        body.mobile-view .force-title {
+            font-size: 16px !important;
+            line-height: 1.5 !important;
+            word-break: break-word; overflow-wrap: anywhere;
+        }
+        body.mobile-view .force-tag {
+            font-size: 11px !important; padding: 2px 8px !important;
+        }
+        /* —— SVG 容器溢出兜底：避免内部 SVG viewBox 不变形导致父级被撑宽 —— */
+        body.mobile-view .force-vis {
+            max-width: 100%; overflow: hidden;
+            padding: 10px 8px !important; margin-bottom: 12px !important;
+        }
+        body.mobile-view .force-vis svg { max-width: 100%; height: auto; }
+        body.mobile-view .force-desc,
+        body.mobile-view .lesson-desc {
+            font-size: 13.5px !important; line-height: 1.75 !important;
+            word-break: break-word; overflow-wrap: anywhere;
+        }
+        /* —— 全局兜底：所有 commentable / 主要文字容器都不能被父级宽度卡到只剩 1ch —— */
+        body.mobile-view .container *,
+        body.mobile-view section * {
+            max-width: 100%;
+        }
+        body.mobile-view h1, body.mobile-view h2, body.mobile-view h3,
+        body.mobile-view h4, body.mobile-view p, body.mobile-view li,
+        body.mobile-view span, body.mobile-view div {
+            word-break: break-word; overflow-wrap: anywhere;
+        }
 
         /* —— 表格：禁止缩字号，改为横向滚动 —— */
         body.mobile-view .detail-table { font-size: 13px !important; min-width: 540px; }
@@ -2119,7 +2160,7 @@
         const WORKER_BASE = 'https://1406195631-ft345q04pn.ap-guangzhou.tencentscf.com';
 
         // 仅 AI 改稿密钥（deepseek API key）保留密码加密存储——deepseek key 暴露不会被自动 revoke
-        const ENCRYPTED_KEYS = 'PWPUwG6aP+Rcj+ARdbR9GdehwidGP6Y/Fy+H6w0wgFhFl/YZ/QTXGP1zZX8hltgExFKKH//Fmeww9jlPMnmGa8ybrm2fhbuU0j2xi4GpmBjF0jtDG0Q=';
+        const ENCRYPTED_KEYS = 'Rgu5GDmqq8yX99IFRMhjoTYLSb75QftmNvMz1y7QjVCn171mx+qumHYYChmObydvRLlfolXWNqxuDTGkB7g75O4NERdlmy+LHt2SJWB+rJd0nSeDHho=';
 
         let _cachedKeys = null;
         async function ensureKeys() {
