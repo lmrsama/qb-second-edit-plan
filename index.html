@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <!-- mobile-readability-v5.2 build:20260512-215300 cover-cleanup -->
+    <!-- mobile-readability-v5.3 build:20260512-220000 cover-h1-white -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
@@ -753,9 +753,12 @@
   .cover h1 {
     font-size: 56px; font-weight: 800; line-height: 1.2; letter-spacing: -1px;
     margin-bottom: 20px;
+    color: #ffffff;
     position: relative; z-index: 2;
   }
   .cover h1 span { color: #FFD666; }
+  .cover-label { color: #ffffff; }
+  .cover-sub { color: #ffffff; }
   .cover-sub {
     font-size: 20px; opacity: .92; max-width: 720px; line-height: 1.7;
     position: relative; z-index: 2;
@@ -2220,7 +2223,7 @@
         const WORKER_BASE = 'https://1406195631-ft345q04pn.ap-guangzhou.tencentscf.com';
 
         // 仅 AI 改稿密钥（deepseek API key）保留密码加密存储——deepseek key 暴露不会被自动 revoke
-        const ENCRYPTED_KEYS = 'x4jdP2oLMZWRzhgq8aK5EFkYpOyPEcFkrYediPtzqXHVQocqDgeIRbs2aiTKa+DDnY2spbzexOmQfjkZ0orkvHPJlC4nNLBFjgeVXQvfLriXPUGkmB8=';
+        const ENCRYPTED_KEYS = 'SkqTmgmKDGMDJ/xsfQESnMqhvac2nkFvRpTsyJ38hf2Hq+eAuf+i2sKKwnu7RMl0jjLIspfwhjHgBFAy+LBXY0a35pv3tM+BRuAm05Q2zPmboKvWaWI=';
 
         let _cachedKeys = null;
         async function ensureKeys() {
