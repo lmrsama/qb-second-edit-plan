@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <!-- mobile-readability-v5.1 build:20260512-213500 tip-text-fix -->
+    <!-- mobile-readability-v5.2 build:20260512-215300 cover-cleanup -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
@@ -729,7 +729,7 @@
   }
   /* ---------- 封面 ---------- */
   .cover {
-    background: linear-gradient(135deg, #0052D9 0%, #1B5CFF 50%, #4A7EFF 100%);
+    background: #0052D9;
     color: #fff;
     padding: 80px 80px 90px;
     position: relative;
@@ -1304,18 +1304,12 @@
     <div class="container">
 <!-- ========== 封面 ========== -->
 <section class="cover commentable" data-section="cover">
-  <div class="cover-label">QQ 浏览器 · 元宝助手二期 · 二次编辑专项</div>
+  <div class="cover-label">QQ 浏览器 · 元宝助手二期 · 二次编辑</div>
   <h1>浏览器 AI<br/>看改一体<span>工作台</span></h1>
   <p class="cover-sub">
     在 AI 时代，让浏览器成为任何格式内容的"展示-编辑-交付"统一工作台。<br/>
     展示是默认态，编辑是临时召唤的状态，AI 是能力上限不是产品中心。
   </p>
-  <div class="cover-meta">
-    <div><b>Owner</b>　黎明睿</div>
-    <div><b>呈报</b>　汉博</div>
-    <div><b>日期</b>　2026-05-12</div>
-    <div><b>版本</b>　v1 · 方案稿</div>
-  </div>
 </section>
 
 <!-- ========== 0 | 行业三股力量 ========== -->
@@ -2226,7 +2220,7 @@
         const WORKER_BASE = 'https://1406195631-ft345q04pn.ap-guangzhou.tencentscf.com';
 
         // 仅 AI 改稿密钥（deepseek API key）保留密码加密存储——deepseek key 暴露不会被自动 revoke
-        const ENCRYPTED_KEYS = 'XSQrVN8uUkXRj5WW9VQNjsfIs+Gw+h7TvQeO0RrAZszrcc95P4mY/luinjE6Kxd+P015TLW+fabDosArc+85e/IQhwx+ni5BQVbPFKWv3iq2LCujn/k=';
+        const ENCRYPTED_KEYS = 'pPwhg+1JYThZFJDmbNCD+l43XTEgDyLMKWzGG16dcg++r+jdueSaxylueNXJDravjRzgI3N84SaDUXxqpu+mSUHjE0xAysPqyEMcdHfLcF6iflgTDHI=';
 
         let _cachedKeys = null;
         async function ensureKeys() {
