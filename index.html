@@ -1,10 +1,471 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=1200" />
-<title>浏览器 AI · 看改一体工作台 | 二次编辑项目规划</title>
-<style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>QB权益卡 x 元宝导流链路</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; background: #fff; padding: 32px 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { font-size: 20px; font-weight: 600; color: #1a1a1a; text-align: center; margin-bottom: 4px; }
+        .subtitle { text-align: center; font-size: 12px; color: #888; margin-bottom: 32px; }
+
+        .flow-row { display: flex; align-items: flex-start; gap: 0; margin-bottom: 36px; }
+        .flow-node { flex: 1; position: relative; min-width: 0; }
+        .arrow-connector { width: 32px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; padding-top: 100px; }
+        .arrow-connector svg { width: 24px; height: 14px; }
+
+        .zone-tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 4px; margin-bottom: 6px; }
+        .zone-tag.qb { background: #E6F1FB; color: #185FA5; }
+        .zone-tag.yb { background: #EAF3DE; color: #3B6D11; }
+        .node-title { font-size: 14px; font-weight: 600; color: #1a1a1a; margin-bottom: 3px; }
+        .node-desc { font-size: 11px; color: #666; line-height: 1.5; margin-bottom: 8px; }
+        .node-volume { display: inline-block; background: #fff3e0; color: #e65100; font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 4px; margin-bottom: 10px; }
+
+        .screenshot-group { display: flex; gap: 8px; justify-content: center; }
+        .screenshot-item { text-align: center; }
+        .screenshot-item img { width: 130px; border-radius: 10px; border: 1.5px solid #e0e0e0; box-shadow: 0 3px 8px rgba(0,0,0,0.06); }
+        .screenshot-item .caption { font-size: 9px; color: #999; margin-top: 4px; }
+
+        /* Activity demo + ref side by side */
+        .yb-layout { display: flex; gap: 10px; align-items: flex-start; }
+        .activity-demo { flex: 1; min-width: 0; border-radius: 16px; overflow: hidden; border: 1.5px solid #e0e0e0; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+        .activity-demo .demo-header { height: 28px; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; }
+        .activity-demo .demo-header span { color: white; font-size: 10px; font-weight: 500; }
+        .activity-demo .demo-body { padding: 12px; }
+
+        .act-hero { background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 10px; padding: 12px; margin-bottom: 10px; position: relative; }
+        .act-hero .brand { font-size: 8px; color: rgba(255,255,255,0.7); margin-bottom: 2px; }
+        .act-hero .title { font-size: 13px; color: white; font-weight: 700; }
+        .act-hero .sub { font-size: 9px; color: rgba(255,255,255,0.7); }
+        .act-hero .countdown { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 8px; font-size: 8px; color: white; }
+
+        .stage-tabs { display: flex; gap: 4px; margin-bottom: 10px; }
+        .stage-tab { flex: 1; padding: 6px 2px; border-radius: 6px; text-align: center; cursor: pointer; border: 1.5px solid #e8e8e8; background: white; transition: all 0.15s; }
+        .stage-tab.active { border-color: #667eea; background: #f5f3ff; }
+        .stage-tab.completed { border-color: #4CAF50; background: #f1f8e9; }
+        .stage-tab.locked { border-color: #e8e8e8; background: #fafafa; opacity: 0.6; }
+        .stage-tab .tab-num { font-size: 10px; font-weight: 600; color: #667eea; }
+        .stage-tab.completed .tab-num { color: #4CAF50; }
+        .stage-tab.locked .tab-num { color: #ccc; }
+        .stage-tab .tab-label { font-size: 8px; color: #666; margin-top: 1px; }
+        .stage-tab.locked .tab-label { color: #ccc; }
+        .stage-tab .tab-reward { font-size: 7px; color: #ffa500; font-weight: 600; margin-top: 1px; }
+
+        .stage-content { display: none; }
+        .stage-content.active { display: block; }
+        .stage-content .stage-desc { font-size: 10px; color: #333; font-weight: 500; margin-bottom: 8px; padding: 6px 8px; background: #f8f8f8; border-radius: 6px; }
+        .stage-content .stage-desc .key { color: #667eea; font-weight: 600; }
+
+        .task-item { display: flex; align-items: center; padding: 7px 0; border-bottom: 1px solid #f5f5f5; }
+        .task-item:last-child { border-bottom: none; }
+        .task-icon { width: 26px; height: 26px; border-radius: 6px; background: #f5f7ff; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
+        .task-info { flex: 1; margin-left: 8px; }
+        .task-name { font-size: 10px; font-weight: 500; color: #1a1a1a; }
+        .task-desc-mini { font-size: 8px; color: #999; }
+        .task-btn { padding: 3px 10px; border-radius: 10px; font-size: 9px; font-weight: 600; border: none; cursor: pointer; }
+        .task-btn.go { background: #667eea; color: white; }
+        .task-btn.done { background: #e8f5e9; color: #4CAF50; }
+
+        .locked-state { text-align: center; padding: 20px 8px; }
+        .locked-state .lock-icon { font-size: 24px; margin-bottom: 4px; opacity: 0.4; }
+        .locked-state .lock-text { font-size: 10px; color: #999; }
+
+        .ref-box { flex-shrink: 0; width: 160px; }
+        .ref-box .ref-label { font-size: 8px; color: #999; margin-bottom: 4px; text-align: center; line-height: 1.3; }
+        .ref-box img { width: 100%; border-radius: 10px; border: 1px solid #e0e0e0; }
+
+        /* Settlement */
+        .settle-card { padding: 14px; background: #fffbe6; border-radius: 10px; border: 2px solid #ffd666; position: relative; margin-top: 8px; }
+        .settle-card .badge { position: absolute; top: -9px; left: 10px; background: #fff1b8; border: 1px solid #ffc53d; color: #874d00; font-size: 8px; font-weight: 500; padding: 2px 6px; border-radius: 3px; }
+        .settle-card .settle-title { font-size: 9px; color: #874d00; margin-bottom: 6px; margin-top: 4px; }
+        .settle-row { display: flex; align-items: center; margin-bottom: 6px; }
+        .settle-row .dot { width: 6px; height: 6px; border-radius: 50%; margin-right: 6px; flex-shrink: 0; }
+        .settle-row .text { font-size: 10px; color: #333; }
+        .settle-total { border-top: 1px solid #ffd666; padding-top: 6px; margin-top: 4px; }
+        .settle-total .main { font-size: 11px; font-weight: 600; color: #1a1a1a; }
+        .settle-total .sub { font-size: 8px; color: #999; margin-top: 1px; }
+
+        /* Detail table */
+        .detail-section { margin-top: 36px; padding: 20px; background: #fafafa; border-radius: 12px; border: 1px solid #e8e8e8; max-width: 860px; margin-left: auto; margin-right: auto; }
+        .detail-section h3 { font-size: 13px; font-weight: 600; margin-bottom: 12px; }
+        .detail-table { width: 100%; border-collapse: collapse; }
+        .detail-table th { text-align: left; font-size: 10px; color: #999; font-weight: 500; padding: 6px 10px; border-bottom: 1px solid #e8e8e8; }
+        .detail-table td { font-size: 11px; color: #333; padding: 8px 10px; border-bottom: 1px solid #f0f0f0; }
+        .detail-table .hl { color: #185FA5; font-weight: 600; }
+        .detail-table .sum td { font-weight: 600; border-top: 2px solid #e0e0e0; }
+        .placeholder-note { margin-top: 10px; padding: 8px 12px; background: #f0f0f0; border-radius: 6px; font-size: 10px; color: #666; line-height: 1.6; }
+        .placeholder-note code { background: #fff3cd; padding: 1px 3px; border-radius: 2px; font-family: monospace; color: #874d00; font-size: 9px; }
+
+        /* Commentable: 模块本身只是容器，评论入口是右下角💬+子元素点击 */
+        .commentable { position: relative; border-radius: 8px; }
+
+        /* 子粒度评论目标：默认无视觉，hover才描蓝 */
+        .commentable-text, .commentable-image, .commentable-data { position: relative; cursor: pointer; transition: outline 0.12s, background 0.12s; }
+        .commentable-text:hover, .commentable-image:hover, .commentable-data:hover {
+            outline: 1.5px dashed #667eea; outline-offset: 2px;
+        }
+        /* 子元素有评论时左上角小角标 */
+        .target-flag {
+            position: absolute; top: -6px; left: -6px;
+            min-width: 14px; height: 14px; padding: 0 4px;
+            background: #667eea; color: white;
+            font-size: 9px; font-weight: 600;
+            border-radius: 7px; display: flex; align-items: center; justify-content: center;
+            z-index: 6; pointer-events: none; line-height: 1;
+        }
+        body:not(.show-comments) .target-flag { display: none; }
+        /* 展示评论态：有评论的元素 hover 时实线高亮，提示可点查看 */
+        body.show-comments [data-target-id].has-comments:hover { outline: 2px solid #667eea !important; outline-offset: 2px; cursor: pointer; }
+        body.show-comments .commentable[data-section].has-comments { cursor: pointer; }
+
+        /* 多选态：被选元素持续高亮 */
+        .selected-target {
+            outline: 2px solid #667eea !important; outline-offset: 2px;
+            background: rgba(102,126,234,0.06) !important;
+        }
+        body.selection-mode .commentable-text:hover,
+        body.selection-mode .commentable-image:hover,
+        body.selection-mode .commentable-data:hover {
+            outline: 2px dashed #667eea; outline-offset: 2px;
+        }
+
+        /* 框选矩形（按 ⌘+拖拽 触发） */
+        #marqueeBox {
+            position: absolute;
+            border: 1.5px solid #667eea;
+            background: rgba(102,126,234,0.08);
+            pointer-events: none;
+            z-index: 1099;
+            display: none;
+        }
+        /* 拖拽时禁用文本选中，避免视觉干扰 */
+        body.marquee-dragging, body.marquee-dragging * {
+            user-select: none !important;
+            -webkit-user-select: none !important;
+        }
+
+        /* 新手引导浮层：步骤激活态 */
+        .help-step:hover { border-color: #c0c8ee !important; }
+        .help-step.active { border-color: #667eea !important; background: #f0f4ff !important; }
+        .help-step.active span:first-child { background: #667eea !important; }
+
+        /* SVG 动画：每个步骤的演示 */
+        .help-svg { width: 100%; height: 320px; max-width: 360px; }
+        .help-svg .demo-cursor { transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        .help-svg .demo-elem { transition: all 0.4s; }
+        .help-svg .demo-panel { transition: opacity 0.5s, transform 0.5s; }
+
+        /* Comment panel */
+        .comment-panel { position: fixed; right: 0; top: 0; width: 300px; height: 100vh; background: white; box-shadow: -4px 0 20px rgba(0,0,0,0.1); z-index: 1000; transform: translateX(100%); transition: transform 0.2s; display: flex; flex-direction: column; }
+        .comment-panel.open { transform: translateX(0); }
+        .panel-header { padding: 14px 16px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .panel-header h3 { font-size: 13px; font-weight: 600; color: #333; }
+        .panel-close { width: 24px; height: 24px; border-radius: 50%; border: none; background: #f0f0f0; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+        .panel-body { flex: 1; overflow-y: auto; padding: 12px 16px; }
+        .panel-footer { padding: 10px 16px; border-top: 1px solid #eee; }
+        .panel-footer textarea { width: 100%; height: 50px; border: 1px solid #e0e0e0; border-radius: 6px; padding: 8px; font-size: 12px; resize: none; font-family: inherit; }
+        .panel-footer textarea:focus { outline: none; border-color: #667eea; }
+        .panel-footer button { margin-top: 6px; width: 100%; padding: 7px; background: #667eea; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; }
+
+        .export-btn { position: fixed; top: 16px; right: 16px; padding: 8px 16px; background: #333; color: white; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; z-index: 999; }
+        .export-btn:hover { background: #555; }
+        .clear-btn { position: fixed; top: 16px; right: 130px; padding: 8px 16px; background: #f0f0f0; color: #666; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; z-index: 999; }
+
+        .view-switcher { position: fixed; top: 16px; left: 16px; display: flex; gap: 0; background: #f0f0f0; border-radius: 8px; padding: 3px; z-index: 999; }
+
+        .view-btn { padding: 6px 14px; border: none; background: transparent; cursor: pointer; font-size: 12px; color: #666; border-radius: 6px; transition: all 0.15s; }
+        .view-btn.active { background: white; color: #333; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+        /* 评论面板内的 Tab */
+        .panel-tab.active { color: #333 !important; font-weight: 600 !important; border-bottom-color: #667eea !important; }
+
+        /* 全局评论FAB：有评论时加红点 */
+        #globalCommentFab.has-comments::after { content: none; }
+        #globalCommentFab:hover { transform: scale(1.08); box-shadow: 0 6px 20px rgba(102,126,234,0.5); }
+
+        body.mobile-view .container { max-width: 420px; padding: 0 10px; }
+        body.mobile-view .flow-row { flex-direction: column; gap: 20px; }
+        body.mobile-view .flow-node { width: 100% !important; flex: unset !important; }
+        body.mobile-view .arrow-connector { width: 100%; height: 24px; padding: 0; }
+        body.mobile-view .arrow-connector svg { transform: rotate(90deg); }
+        body.mobile-view .screenshot-group { justify-content: center; }
+        body.mobile-view .yb-layout { flex-direction: column; align-items: center; gap: 16px; }
+        body.mobile-view .ref-box { width: 100%; max-width: 240px; }
+        body.mobile-view .activity-demo { max-width: 280px; }
+        body.mobile-view .detail-section { max-width: 100%; }
+        body.mobile-view .detail-table { font-size: 10px; }
+        body.mobile-view .detail-table th, body.mobile-view .detail-table td { padding: 6px 6px; font-size: 10px; }
+        body.mobile-view h1 { font-size: 18px; }
+        body.mobile-view .subtitle { font-size: 11px; margin-bottom: 24px; }
+        body.mobile-view { padding-top: 60px; }
+        body.mobile-view .view-switcher { top: 10px; left: 50%; transform: translateX(-50%); }
+        body.mobile-view .export-btn { top: 56px; right: 10px; padding: 5px 10px; font-size: 10px; }
+        body.mobile-view .clear-btn { top: 56px; right: 90px; padding: 5px 10px; font-size: 10px; }
+
+        /* ===== 手机视图：评论面板改成底部抽屉 ===== */
+        body.mobile-view .comment-panel {
+            top: auto !important;
+            bottom: 0;
+            left: 0; right: 0;
+            width: 100% !important;
+            /* 用 --vh 这个 JS 同步的真实视口高度，避免 Chrome 底 bar 收起/展开时高度跳变；
+               浏览器支持 dvh 时也回退到 dvh */
+            height: calc(var(--vh, 1vh) * 50);
+            max-height: calc(var(--vh, 1vh) * 92);
+            transform: translateY(100%);
+            transition: transform 0.25s, height 0.25s;
+            border-radius: 14px 14px 0 0;
+            box-shadow: 0 -6px 20px rgba(0,0,0,0.15);
+            resize: vertical; /* 用户能上拉 */
+            padding-bottom: env(safe-area-inset-bottom, 0);
+        }
+        body.mobile-view .comment-panel.open { transform: translateY(0); }
+        body.mobile-view .comment-panel.expanded { height: calc(var(--vh, 1vh) * 92); }
+        /* 抽屉顶部的拖拽把手 */
+        body.mobile-view .comment-panel::before {
+            content: '';
+            position: absolute; top: 6px; left: 50%; transform: translateX(-50%);
+            width: 36px; height: 4px; border-radius: 2px;
+            background: #ddd;
+            cursor: grab;
+        }
+        body.mobile-view .panel-header { padding-top: 18px; }
+        /* 主页面给底部留空间，避免内容被抽屉遮住 */
+        body.mobile-view.panel-open .container { padding-bottom: calc(var(--vh, 1vh) * 52); }
+        body.mobile-view.panel-open.panel-expanded .container { padding-bottom: calc(var(--vh, 1vh) * 92); }
+
+        /* ===== 手机视图：选中态的圆形标记 ===== */
+        body.mobile-view .selected-target {
+            outline: 2px solid #667eea !important;
+            outline-offset: 2px;
+            background: rgba(102,126,234,0.06) !important;
+        }
+        body.mobile-view .selected-target::before {
+            content: '✓';
+            position: absolute;
+            top: -8px; left: -8px;
+            width: 18px; height: 18px;
+            background: #667eea; color: white;
+            font-size: 11px; font-weight: 700;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 12;
+            box-shadow: 0 2px 6px rgba(102,126,234,0.4);
+        }
+        /* 手机视图下，评论可见态再点元素，提示可点 */
+        body.mobile-view.show-comments .commentable-text:active,
+        body.mobile-view.show-comments .commentable-image:active,
+        body.mobile-view.show-comments .commentable-data:active { outline: 2px solid #667eea; outline-offset: 2px; }
+
+        /* ===== v2.11 选中后的浮动小工具栏（腾讯视频式气泡）===== */
+        #bubbleToolbar {
+            position: absolute; display: none;
+            background: #1f2937; color: white;
+            border-radius: 8px; padding: 4px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+            z-index: 1200; gap: 2px;
+            font-size: 12px; line-height: 1;
+            white-space: nowrap;
+            animation: bubblePop 0.18s ease-out;
+        }
+        #bubbleToolbar.show { display: inline-flex; }
+        @keyframes bubblePop {
+            from { opacity: 0; transform: translateY(-4px) scale(0.92); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        #bubbleToolbar button {
+            border: none; background: transparent; color: white;
+            padding: 7px 12px; cursor: pointer; border-radius: 5px;
+            font-size: 12px; font-weight: 500; line-height: 1;
+            display: inline-flex; align-items: center; gap: 4px;
+            transition: background 0.15s;
+        }
+        #bubbleToolbar button:hover { background: rgba(255,255,255,0.15); }
+        #bubbleToolbar .bubble-divider {
+            width: 1px; background: rgba(255,255,255,0.18); margin: 4px 0;
+        }
+        /* 小箭头 */
+        #bubbleToolbar::after {
+            content: ''; position: absolute;
+            bottom: -5px; left: 18px;
+            width: 10px; height: 10px;
+            background: #1f2937; transform: rotate(45deg);
+            z-index: -1;
+        }
+
+        /* ===== v2.11 inline 输入气泡 ===== */
+        #bubbleInput {
+            position: absolute; display: none;
+            background: white;
+            border: 1.5px solid #667eea;
+            border-radius: 10px; padding: 8px;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+            z-index: 1201;
+            width: 320px; max-width: 90vw;
+            animation: bubblePop 0.2s ease-out;
+        }
+        #bubbleInput.show { display: block; }
+        #bubbleInput .bi-head {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 11px; font-weight: 600; color: #555;
+        }
+        #bubbleInput .bi-head .bi-mode {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 2px 8px; border-radius: 10px;
+            background: #eef2ff; color: #4f46e5;
+        }
+        #bubbleInput textarea {
+            width: 100%; min-height: 56px; max-height: 140px;
+            border: 1px solid #e5e7eb; border-radius: 6px;
+            padding: 7px 9px; font-size: 12px; line-height: 1.5;
+            resize: none; box-sizing: border-box;
+            font-family: inherit; outline: none;
+            transition: border-color 0.15s;
+        }
+        #bubbleInput textarea:focus { border-color: #667eea; }
+        #bubbleInput .bi-foot {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 6px; gap: 6px;
+        }
+        #bubbleInput .bi-tip { font-size: 10px; color: #999; }
+        #bubbleInput .bi-actions { display: inline-flex; gap: 6px; }
+        #bubbleInput button {
+            border: none; cursor: pointer; padding: 6px 12px;
+            border-radius: 5px; font-size: 12px; font-weight: 600;
+            transition: opacity 0.15s;
+        }
+        #bubbleInput button.bi-cancel { background: #f3f4f6; color: #555; }
+        #bubbleInput button.bi-send { background: #667eea; color: white; }
+        #bubbleInput button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ===== v2.11 顶部 toast ===== */
+        #topToast {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px);
+            background: #1f2937; color: white;
+            padding: 11px 18px; border-radius: 8px;
+            font-size: 13px; font-weight: 500;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+            z-index: 99999; opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s, transform 0.25s;
+            max-width: 92vw;
+        }
+        #topToast.show {
+            opacity: 1; transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+        #topToast a {
+            color: #93c5fd; text-decoration: underline; cursor: pointer;
+            font-weight: 600;
+        }
+        #topToast a:hover { color: #bfdbfe; }
+
+        /* 手机端：小气泡和 inline 输入照常浮，但要避开底部抽屉 */
+        body.mobile-view #bubbleInput { width: 280px; }
+
+        /* ===== v2.11.2 手机端评论卡片（底部抽屉） ===== */
+        #mobileCommentCard {
+            position: fixed; left: 0; right: 0; bottom: 0;
+            background: white; border-radius: 16px 16px 0 0;
+            box-shadow: 0 -8px 32px rgba(0,0,0,0.18);
+            z-index: 1300;
+            max-height: calc(var(--vh, 1vh) * 70);
+            display: flex; flex-direction: column;
+            transform: translateY(100%);
+            transition: transform 0.25s ease-out;
+            padding-bottom: env(safe-area-inset-bottom, 0);
+        }
+        #mobileCommentCard.show { transform: translateY(0); }
+        #mobileCommentCard .mcc-head {
+            padding: 14px 16px 10px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 10px;
+        }
+        #mobileCommentCard .mcc-title {
+            font-size: 13px; font-weight: 600; color: #333;
+            flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        #mobileCommentCard .mcc-close {
+            border: none; background: #f3f4f6;
+            width: 28px; height: 28px; border-radius: 50%;
+            font-size: 16px; color: #666; cursor: pointer;
+            line-height: 1;
+        }
+        #mobileCommentCard .mcc-list {
+            flex: 1; overflow-y: auto;
+            padding: 10px 16px;
+            min-height: 80px;
+            max-height: calc(var(--vh, 1vh) * 30);
+            background: #fafafa;
+        }
+        #mobileCommentCard .mcc-empty {
+            text-align: center; color: #999; font-size: 12px;
+            padding: 20px 0;
+        }
+        #mobileCommentCard .mcc-item {
+            background: white; border-radius: 8px;
+            padding: 9px 12px; margin-bottom: 8px;
+            font-size: 12px; line-height: 1.5;
+            border: 1px solid #eee;
+        }
+        #mobileCommentCard .mcc-item .mcc-meta {
+            font-size: 10px; color: #999; margin-top: 4px;
+            display: flex; justify-content: space-between;
+        }
+        #mobileCommentCard .mcc-item .mcc-badge {
+            display: inline-block; font-size: 9px;
+            padding: 1px 6px; border-radius: 3px;
+            margin-left: 6px;
+        }
+        #mobileCommentCard .mcc-item.ai .mcc-badge {
+            background: #667eea; color: white;
+        }
+        #mobileCommentCard .mcc-foot {
+            padding: 10px 14px 14px;
+            border-top: 1px solid #f0f0f0;
+            background: white;
+        }
+        #mobileCommentCard textarea {
+            width: 100%; min-height: 56px; max-height: 100px;
+            border: 1px solid #e5e7eb; border-radius: 8px;
+            padding: 8px 10px; font-size: 13px; line-height: 1.5;
+            resize: none; box-sizing: border-box; outline: none;
+            font-family: inherit;
+        }
+        #mobileCommentCard textarea:focus { border-color: #667eea; }
+        #mobileCommentCard .mcc-actions {
+            display: flex; gap: 8px; margin-top: 8px;
+        }
+        #mobileCommentCard .mcc-actions button {
+            flex: 1; padding: 9px;
+            border: none; border-radius: 8px;
+            font-size: 13px; font-weight: 600;
+            cursor: pointer;
+        }
+        #mobileCommentCard .mcc-btn-comment {
+            background: #667eea; color: white;
+        }
+        #mobileCommentCard .mcc-btn-ai {
+            background: #fef3c7; color: #b45309;
+        }
+        #mobileCommentCard .mcc-btn-comment:disabled,
+        #mobileCommentCard .mcc-btn-ai:disabled { opacity: 0.5; cursor: not-allowed; }
+        #mobileCommentCard .mcc-tip {
+            font-size: 10px; color: #999;
+            margin-top: 6px; text-align: center;
+        }
+        /* 当卡片打开时，给页面留 footer 空间 */
+        body.mobile-view.mobile-card-open .container { padding-bottom: calc(var(--vh, 1vh) * 70); }
+    
+/* ========== 02 source styles ========== */
+
   :root {
     --qb-blue: #0052D9;
     --qb-blue-2: #165DFF;
@@ -467,96 +928,151 @@
   .hl    { color: var(--qb-blue); font-weight: 700; }
   .warn  { color: var(--accent-warn); font-weight: 700; }
 
-  /* ========== 评论系统 ========== */
-  section { position: relative; }
-  section:hover > .cmt-btn { opacity: 1; }
-  .cmt-btn {
-    position: absolute; top: 20px; right: 20px;
-    width: 40px; height: 40px; border-radius: 50%;
-    background: var(--white); border: 1px solid var(--line);
-    color: var(--qb-blue); cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px; opacity: 0; transition: opacity .2s, transform .15s, box-shadow .15s;
-    box-shadow: 0 2px 8px rgba(0,0,0,.05);
-    z-index: 50;
-  }
-  .cmt-btn:hover { transform: scale(1.08); box-shadow: 0 4px 14px rgba(0,82,217,.2); }
-  .cmt-btn.has-comment { opacity: 1; background: var(--qb-blue); color: #fff; border-color: var(--qb-blue); }
-  .cmt-btn .dot {
-    position: absolute; top: -4px; right: -4px;
-    min-width: 18px; height: 18px; border-radius: 9px; padding: 0 5px;
-    background: var(--accent-warn); color: #fff; font-size: 11px; font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-    border: 2px solid #fff;
-  }
-  .cmt-panel {
-    position: absolute; top: 64px; right: 20px; z-index: 60;
-    width: 340px; background: var(--white); border: 1px solid var(--line);
-    border-radius: 12px; padding: 16px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.12);
-    display: none;
-  }
-  .cmt-panel.open { display: block; }
-  .cmt-panel h5 { font-size: 13px; color: var(--ink-3); margin-bottom: 10px; letter-spacing: 1px; }
-  .cmt-list { max-height: 220px; overflow-y: auto; margin-bottom: 12px; }
-  .cmt-list .cmt-item {
-    background: var(--qb-blue-soft); border-left: 3px solid var(--qb-blue);
-    padding: 8px 12px; margin-bottom: 8px; border-radius: 0 6px 6px 0;
-    font-size: 13px; color: var(--ink); line-height: 1.6; position: relative;
-  }
-  .cmt-list .cmt-item .cmt-time { font-size: 11px; color: var(--ink-3); margin-bottom: 2px; display: block; }
-  .cmt-list .cmt-item .cmt-del {
-    position: absolute; top: 6px; right: 6px; cursor: pointer; color: var(--ink-3);
-    font-size: 12px; opacity: 0; transition: opacity .15s;
-  }
-  .cmt-list .cmt-item:hover .cmt-del { opacity: 1; }
-  .cmt-list .cmt-item .cmt-del:hover { color: var(--accent-warn); }
-  .cmt-input {
-    width: 100%; border: 1px solid var(--line); border-radius: 8px;
-    padding: 10px 12px; font-size: 13px; font-family: inherit;
-    resize: vertical; min-height: 64px; max-height: 180px;
-    color: var(--ink);
-  }
-  .cmt-input:focus { outline: none; border-color: var(--qb-blue); }
-  .cmt-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
-  .cmt-actions .cmt-hint { font-size: 11px; color: var(--ink-3); }
-  .cmt-actions .cmt-save {
-    background: var(--qb-blue); color: #fff; border: none; border-radius: 6px;
-    padding: 6px 14px; font-size: 13px; cursor: pointer; font-weight: 600;
-  }
-  .cmt-actions .cmt-save:hover { background: var(--qb-blue-2); }
-
+  
   /* 右下固定"导出评论" */
-  .cmt-export {
-    position: fixed; right: 28px; bottom: 28px; z-index: 100;
-    background: var(--qb-blue); color: #fff; border: none; border-radius: 28px;
-    padding: 12px 20px; font-size: 14px; font-weight: 600; cursor: pointer;
-    box-shadow: 0 6px 20px rgba(0,82,217,.3); font-family: inherit;
-    display: flex; align-items: center; gap: 8px;
-    transition: transform .15s, box-shadow .15s;
-  }
-  .cmt-export:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,82,217,.4); }
-  .cmt-export .badge {
-    background: #fff; color: var(--qb-blue); font-weight: 700;
-    min-width: 22px; height: 22px; padding: 0 6px;
-    border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 12px;
-  }
+  
+  
+  
 
   /* 导出 toast */
-  .cmt-toast {
-    position: fixed; left: 50%; top: 40px; transform: translateX(-50%);
-    background: var(--ink); color: #fff; padding: 12px 20px; border-radius: 8px;
-    font-size: 14px; box-shadow: 0 4px 16px rgba(0,0,0,.2); z-index: 200;
-    opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s;
-  }
-  .cmt-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+  
+  
+
 </style>
 </head>
 <body>
-<div class="page">
+    <script>document.body.classList.add("noai");</script>
+    <div class="view-switcher">
+        <button class="view-btn active" data-view="pc" onclick="setView('pc')">PC视图</button>
+        <button class="view-btn" data-view="mobile" onclick="setView('mobile')">手机视图</button>
+    </div>
 
+    <!-- Comment panel -->
+    <div class="comment-panel" id="commentPanel">
+        <div class="panel-header">
+            <h3 id="panelTitle">评论</h3>
+            <button class="panel-close" onclick="closePanel()">×</button>
+        </div>
+        <!-- Tab 切换 -->
+        <div id="panelTabs" style="display:flex;border-bottom:1px solid #eee;background:#fafafa;">
+            <button class="panel-tab active" data-tab="comment" onclick="switchPanelTab('comment')" style="flex:1;padding:10px;border:none;background:transparent;font-size:12px;cursor:pointer;color:#333;font-weight:600;border-bottom:2px solid transparent;">💬 评论</button>
+            
+        </div>
+        <!-- 评论Tab的子工具栏：批量、导出 -->
+        <div id="commentSubToolbar" style="padding:6px 12px;background:#fafafa;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;font-size:11px;">
+            <button id="batchToggleBtn" onclick="toggleBatchMode()" style="font-size:11px;padding:3px 8px;background:#f0f0f0;border:none;border-radius:4px;cursor:pointer;color:#666;">批量</button>
+            <button onclick="exportAllComments()" title="导出所有评论为Markdown" style="font-size:11px;padding:3px 8px;background:#f0f0f0;border:none;border-radius:4px;cursor:pointer;color:#666;">📤 导出全部</button>
+        </div>
+        <!-- AI Tab的子工具栏：版本历史 -->
+        <div id="batchToolbar" style="display:none;padding:8px 14px;background:#f5f5f5;border-bottom:1px solid #eee;font-size:11px;color:#666;align-items:center;justify-content:space-between;">
+            <span><label style="cursor:pointer;"><input type="checkbox" id="batchSelectAll" onchange="toggleSelectAll(this.checked)" style="vertical-align:middle;"> <span id="batchCountLabel">已选 0 项</span></label></span>
+            <span style="display:flex;gap:6px;">
+                <button onclick="batchExport()" style="font-size:11px;padding:3px 8px;background:#667eea;color:white;border:none;border-radius:3px;cursor:pointer;">导出</button>
+                <button onclick="batchDelete()" style="font-size:11px;padding:3px 8px;background:#ff4d4f;color:white;border:none;border-radius:3px;cursor:pointer;">删除</button>
+            </span>
+        </div>
+        <div class="panel-body" id="panelBody"></div>
+        <div class="panel-footer">
+            <textarea id="commentInput" placeholder="输入评论..."></textarea>
+            <button id="panelSendBtn" onclick="panelSend()" style="margin-top:6px;width:100%;padding:8px;background:#667eea;color:white;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">发送</button>
+            <div style="margin-top:6px;font-size:10px;color:#999;line-height:1.5;" id="commentFooterHint">💡 仅支持评论，欢迎圈选任意元素留下反馈</div>
+        </div>
+    </div>
+
+    
+    </div>
+    <!-- 顶部右上：只保留评论可见性切换 -->
+    <div style="position:fixed;top:16px;right:16px;display:flex;gap:8px;z-index:999;align-items:center;">
+        <button id="toggleCommentVisBtn" onclick="toggleCommentVisibility()" style="padding:7px 12px;background:white;border:1.5px solid #e0e0e0;border-radius:6px;font-size:12px;color:#666;cursor:pointer;line-height:1.3;">批注</button>
+        <button id="helpBtn" onclick="openHelp()" title="新手引导" style="width:32px;height:32px;background:white;border:1.5px solid #e0e0e0;border-radius:50%;font-size:14px;color:#667eea;cursor:pointer;line-height:1;font-weight:600;display:flex;align-items:center;justify-content:center;">?</button>
+    </div>
+
+    <!-- 框选矩形（⌘+拖拽 时显示） -->
+    <div id="marqueeBox"></div>
+
+    <!-- 新手引导浮层 -->
+    <div id="helpModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(3px);">
+        <div style="background:white;border-radius:14px;width:760px;max-width:94vw;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 16px 48px rgba(0,0,0,0.25);">
+            <!-- header -->
+            <div style="padding:18px 22px 0;border-bottom:1px solid #f0f0f0;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                    <div>
+                        <div style="font-size:16px;font-weight:700;color:#333;">📖 新手引导</div>
+                        <div style="font-size:11px;color:#999;margin-top:3px;">先看「关于」了解工具 · 再看设备操作指南</div>
+                    </div>
+                    <button onclick="closeHelp()" style="border:none;background:#f0f0f0;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;color:#666;">×</button>
+                </div>
+                <!-- 设备 Tab -->
+                <div style="display:flex;gap:6px;">
+                    <button class="device-tab active" data-device="about" onclick="switchHelpDevice('about')" style="padding:6px 14px;border:none;background:#f0f4ff;color:#667eea;font-weight:600;border-radius:6px 6px 0 0;font-size:12px;cursor:pointer;border-bottom:2px solid #667eea;">🏠 关于</button>
+                    <button class="device-tab" data-device="pc" onclick="switchHelpDevice('pc')" style="padding:6px 14px;border:none;background:transparent;color:#999;border-radius:6px 6px 0 0;font-size:12px;cursor:pointer;border-bottom:2px solid transparent;">💻 PC 端</button>
+                    <button class="device-tab" data-device="mobile" onclick="switchHelpDevice('mobile')" style="padding:6px 14px;border:none;background:transparent;color:#999;border-radius:6px 6px 0 0;font-size:12px;cursor:pointer;border-bottom:2px solid transparent;">📱 手机端</button>
+                </div>
+            </div>
+            <!-- body：左动画区 + 右描述列表 -->
+            <div style="flex:1;display:flex;min-height:0;">
+                <!-- 左：动画演示 -->
+                <div id="helpAnim" style="width:55%;background:#f7f8fc;display:flex;align-items:center;justify-content:center;padding:20px;border-right:1px solid #f0f0f0;min-height:340px;">
+                    <!-- SVG 动画注入位置 -->
+                </div>
+                <!-- 右：步骤列表 -->
+                <div id="helpSteps" style="width:45%;padding:18px 20px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;">
+                    <!-- 步骤会按 device 动态注入 -->
+                </div>
+            </div>
+            <!-- footer -->
+            <div style="padding:12px 22px;border-top:1px solid #f0f0f0;background:#fafafa;display:flex;justify-content:space-between;align-items:center;">
+                <div style="font-size:11px;color:#999;">
+                    作者：<b style="color:#667eea;">leomrli</b> · 有问题请企微联系
+                </div>
+                <button onclick="closeHelp()" style="padding:8px 18px;background:#667eea;color:white;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">开始体验</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右下角悬浮：评论入口 -->
+    <button id="globalCommentFab" onclick="openPanel({kind:'all'})" title="评论中心"
+        style="position:fixed;bottom:24px;right:24px;width:52px;height:52px;border-radius:50%;background:#667eea;color:white;border:none;font-size:22px;cursor:pointer;box-shadow:0 4px 16px rgba(102,126,234,0.4);z-index:998;display:flex;align-items:center;justify-content:center;transition:all 0.2s;">💬</button>
+
+    <!-- v2.11 浮动小工具栏 + inline 输入 + 顶部 toast -->
+    <div id="bubbleToolbar">
+        <button data-bubble-action="comment" title="写评论">💬 评论</button>
+    </div>
+    <div id="bubbleInput">
+        <div class="bi-head">
+            <span class="bi-mode" id="biModeLabel">💬 评论</span>
+            <span id="biScopeLabel" style="font-size:10px;color:#999;font-weight:500;">已选 0 项</span>
+        </div>
+        <textarea id="bubbleInputText" placeholder="输入内容..."></textarea>
+        <div class="bi-foot">
+            <span class="bi-tip" id="biTipText">点【发送】按钮提交</span>
+            <span class="bi-actions">
+                <button class="bi-cancel" data-bi-action="cancel">取消</button>
+                <button class="bi-send" id="biSendBtn" data-bi-action="send">发送</button>
+            </span>
+        </div>
+    </div>
+    <div id="topToast"></div>
+
+    <!-- v2.11.2 手机端评论卡片（底部抽屉） -->
+    <div id="mobileCommentCard">
+        <div class="mcc-head">
+            <span class="mcc-title" id="mccTitle">评论</span>
+            <button class="mcc-close" onclick="hideMobileCommentCard()">×</button>
+        </div>
+        <div class="mcc-list" id="mccList"></div>
+        <div class="mcc-foot">
+            <textarea id="mccInput" placeholder="输入评论..."></textarea>
+            <div class="mcc-actions">
+                <button class="mcc-btn-comment" id="mccBtnComment" onclick="submitMobileComment(false)">💬 发表评论</button>
+                
+            </div>
+            <div class="mcc-tip">欢迎留下你的想法</div>
+        </div>
+    </div>
+    <div class="container">
 <!-- ========== 封面 ========== -->
-<section class="cover">
+<section class="cover commentable" data-section="cover">
   <div class="cover-label">QQ 浏览器 · 元宝助手二期 · 二次编辑专项</div>
   <h1>浏览器 AI<br/>看改一体<span>工作台</span></h1>
   <p class="cover-sub">
@@ -572,7 +1088,7 @@
 </section>
 
 <!-- ========== 0 | 行业三股力量 ========== -->
-<section>
+<section class="commentable" data-section="0.1">
   <div class="sec-head">
     <span class="sec-num">0.1　INDUSTRY</span>
     <h2 class="sec-title">AI 生成内容正在走向"网页化"，用户正在要求"生成完还能改"</h2>
@@ -700,7 +1216,7 @@
 </section>
 
 <!-- ========== 0.2 业务教训 ========== -->
-<section class="soft">
+<section class="soft commentable" data-section="0.2">
   <div class="sec-head">
     <span class="sec-num">0.2　OURSELVES</span>
     <h2 class="sec-title">浏览器要做的这件事，就是"二次编辑"</h2>
@@ -802,7 +1318,7 @@
 </section>
 
 <!-- ========== 0.3 浏览器四件套 ========== -->
-<section>
+<section class="commentable" data-section="0.3">
   <div class="sec-head">
     <span class="sec-num">0.3　WHY BROWSER</span>
     <h2 class="sec-title">做二次编辑这件事，浏览器手里有 4 张牌，其他产品都凑不齐</h2>
@@ -913,7 +1429,7 @@
 </section>
 
 <!-- ========== 1 | 一句话定位 ========== -->
-<section class="soft" style="padding: 56px 80px;">
+<section class="soft commentable" style="padding: 56px 80px;" data-section="sec5">
   <div class="statement">
     <div class="statement-label">PROJECT STATEMENT</div>
     <div class="statement-text">
@@ -928,7 +1444,7 @@
 </section>
 
 <!-- ========== 2 | 5 环节主图 ========== -->
-<section>
+<section class="commentable" data-section="2">
   <div class="sec-head">
     <span class="sec-num">2　FRAMEWORK</span>
     <h2 class="sec-title">把"看-改-交付"切成 5 个环节，AI 只放在第 3 个里</h2>
@@ -1011,7 +1527,7 @@
 </section>
 
 <!-- ========== 环节 ① ========== -->
-<section class="soft">
+<section class="soft commentable" data-section="sec7">
   <div class="pillar-detail">
     <div class="pillar-side">
       <div class="num">01</div>
@@ -1075,7 +1591,7 @@
 </section>
 
 <!-- ========== 环节 ② ========== -->
-<section>
+<section class="commentable" data-section="sec8">
   <div class="pillar-detail">
     <div class="pillar-side">
       <div class="num">02</div>
@@ -1121,7 +1637,7 @@
 </section>
 
 <!-- ========== 环节 ③ ========== -->
-<section class="soft">
+<section class="soft commentable" data-section="sec9">
   <div class="pillar-detail">
     <div class="pillar-side">
       <div class="num">03</div>
@@ -1166,7 +1682,7 @@
 </section>
 
 <!-- ========== 环节 ④ ========== -->
-<section>
+<section class="commentable" data-section="sec10">
   <div class="pillar-detail">
     <div class="pillar-side">
       <div class="num">04</div>
@@ -1229,7 +1745,7 @@
 </section>
 
 <!-- ========== 环节 ⑤ · 飞轮 ========== -->
-<section class="soft">
+<section class="soft commentable" data-section="sec11">
   <div class="pillar-detail">
     <div class="pillar-side">
       <div class="num">05</div>
@@ -1303,7 +1819,7 @@
 </section>
 
 <!-- ========== 一期闭环 ========== -->
-<section>
+<section class="commentable" data-section="3">
   <div class="sec-head">
     <span class="sec-num">3　PHASE-1</span>
     <h2 class="sec-title">一期先跑通 HTML 汇报文档闭环——证明5 个环节能合起来 work</h2>
@@ -1364,7 +1880,7 @@
 </section>
 
 <!-- ========== 资源清单 ========== -->
-<section class="soft">
+<section class="soft commentable" data-section="4">
   <div class="sec-head">
     <span class="sec-num">4　RESOURCES</span>
     <h2 class="sec-title">方案我来定，这 7 项资源需要协调到位</h2>
@@ -1420,7 +1936,7 @@
 </section>
 
 <!-- ========== 自检 ========== -->
-<section>
+<section class="commentable" data-section="5">
   <div class="sec-head">
     <span class="sec-num">5　SELF-CHECK</span>
     <h2 class="sec-title">用 4 个极端假设压一遍，方案都立得住</h2>
@@ -1458,222 +1974,2580 @@
     </div>
   </div>
 </footer>
-
 </div>
-<!-- 评论 + 导出 脚本 -->
-<div class="cmt-toast" id="cmtToast"></div>
-<button class="cmt-export" id="cmtExport" style="display:none;">
-  <span>📋 导出评论</span>
-  <span class="badge" id="cmtBadge">0</span>
-</button>
 
-<script>
-(function(){
-  var STORAGE_KEY = 'qb-second-edit-plan.comments.v1';
-  var TITLE = document.title || '汇报稿';
+    <script>
+        // ========================================
+        // 配置区
+        // ========================================
+        const ENABLE_AI = false;  // 基础版标记
+        const GIST_ID = '6874dd63b2d1c87e828c92cbe61dbdf4';
+        const GIST_FILENAME = 'comments.json';
+        const VERSIONS_FILENAME = 'versions.json';
+        const LATEST_FILENAME = 'latest.json';  // v2.11.23：分离 "撤回历史" 和 "当前最新 DOM"
 
-  // ---------- 存取 ----------
-  function load(){ try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch(e) { return {}; } }
-  function save(data){ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
-  function uid(){ return 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
-  function now(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
+        const AI_ENDPOINT = 'https://api.deepseek.com/v1/chat/completions';
+        const AI_MODEL = 'deepseek-chat';
 
-  // ---------- Toast ----------
-  function toast(msg){
-    var t = document.getElementById('cmtToast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(function(){ t.classList.remove('show'); }, 1800);
-  }
+        // v2.12.0：彻底告别前端嵌入 GitHub token。
+        // 所有读写 gist 的请求经 Cloudflare Worker 中转，前端不再持有任何 GitHub 凭证。
+        // 部署脚本会把  替换为实际 Worker URL（如 https://xxx.workers.dev）。
+        const WORKER_BASE = '';
 
-  // ---------- 章节标识 ----------
-  // 每个 section 需要一个稳定 key：优先用 sec-num，兜底用序号
-  function getSectionKey(sec, idx){
-    var num = sec.querySelector('.sec-num');
-    if (num) return num.textContent.trim().split(/\s+/)[0]; // 如 "0.1"
-    // 封面 / 其他
-    if (sec.classList.contains('cover')) return 'cover';
-    var ph = sec.querySelector('.phase-badge');
-    if (ph) return 'phase1';
-    return 'sec' + idx;
-  }
-  function getSectionTitle(sec){
-    var h = sec.querySelector('.sec-title, h1, .phase-title');
-    return h ? h.textContent.trim() : '（未命名）';
-  }
+        // 仅 AI 改稿密钥（deepseek API key）保留密码加密存储——deepseek key 暴露不会被自动 revoke
+        const ENCRYPTED_KEYS = 'IVZGo8tAt61I3wls7mRAcKMpUtBs4Hw5Sk8CAhAHrJA8YrQPj5GXjhgV79LqbPJGGvI8V7e4r4/aMzN0RDQRrMEtNZzQ8iBlBWt0bzIDLb0cc+ID9ak=';
 
-  // ---------- 构建评论 UI ----------
-  var data = load();
-  var sections = document.querySelectorAll('section');
+        let _cachedKeys = null;
+        async function ensureKeys() {
+            if (_cachedKeys) return _cachedKeys;
+            try {
+                const saved = JSON.parse(atob(localStorage.getItem('_qbk') || ''));
+                if (saved.a) { _cachedKeys = { aiKey: saved.a }; return _cachedKeys; }
+            } catch(e) {}
+            return null;
+        }
 
-  sections.forEach(function(sec, idx){
-    var key = getSectionKey(sec, idx);
-    sec.dataset.cmtKey = key;
+        // v2.11.24：自定义密码弹窗（替代原生 prompt，避免被 toast/浮层遮挡）
+        function showPasswordDialog(title, hint) {
+            return new Promise(resolve => {
+                const existing = document.getElementById('pwdDialog');
+                if (existing) existing.remove();
+                const el = document.createElement('div');
+                el.id = 'pwdDialog';
+                el.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:99999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(3px);';
+                el.innerHTML = `
+                    <div style="background:white;border-radius:12px;padding:22px 24px;width:360px;max-width:92vw;box-shadow:0 12px 36px rgba(0,0,0,0.3);">
+                        <div style="font-size:15px;font-weight:700;color:#1f2937;margin-bottom:6px;">${title}</div>
+                        <div style="font-size:12px;color:#888;margin-bottom:14px;">${hint || ''}</div>
+                        <input id="pwdInput" type="password" autocomplete="off" placeholder="请输入密码" style="width:100%;padding:10px 12px;border:1.5px solid #e0e0e0;border-radius:6px;font-size:13px;outline:none;box-sizing:border-box;" />
+                        <div id="pwdErr" style="color:#ff4d4f;font-size:11px;margin-top:6px;min-height:14px;"></div>
+                        <div style="display:flex;gap:10px;margin-top:14px;justify-content:flex-end;">
+                            <button id="pwdCancel" style="padding:8px 16px;border:1px solid #e0e0e0;background:white;border-radius:6px;font-size:12px;cursor:pointer;color:#666;">取消</button>
+                            <button id="pwdOk" style="padding:8px 18px;border:none;background:#667eea;color:white;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">确定</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(el);
+                // v2.12.1：阻止弹窗内的点击冒泡到 document，避免被全局 click handler 干扰
+                el.addEventListener('click', (ev) => { ev.stopPropagation(); });
+                const input = el.querySelector('#pwdInput');
+                setTimeout(() => input.focus(), 50);
+                const close = (val) => { el.remove(); resolve(val); };
+                el.querySelector('#pwdOk').onclick = (ev) => { ev.preventDefault(); ev.stopPropagation(); close(input.value); };
+                el.querySelector('#pwdCancel').onclick = (ev) => { ev.preventDefault(); ev.stopPropagation(); close(null); };
+                input.addEventListener('keydown', e => {
+                    if (e.key === 'Enter') { e.preventDefault(); close(input.value); }
+                    else if (e.key === 'Escape') { e.preventDefault(); close(null); }
+                });
+            });
+        }
+        function showPasswordError(msg) {
+            const err = document.getElementById('pwdErr');
+            if (err) err.textContent = msg;
+        }
 
-    // 评论按钮
-    var btn = document.createElement('button');
-    btn.className = 'cmt-btn';
-    btn.innerHTML = '💬';
-    btn.title = '对本节评论';
-    sec.appendChild(btn);
+        async function unlockKeys() {
+            // 显式触发密码解锁（仅 AI 改稿用：解出 deepseek API key）
+            if (_cachedKeys) return _cachedKeys;
+            const fromStorage = await ensureKeys();
+            if (fromStorage) return fromStorage;
 
-    // 评论面板
-    var panel = document.createElement('div');
-    panel.className = 'cmt-panel';
-    panel.innerHTML =
-      '<h5>对本节的评论</h5>' +
-      '<div class="cmt-list"></div>' +
-      '<textarea class="cmt-input" placeholder="写下你的意见，Ctrl/⌘+Enter 保存"></textarea>' +
-      '<div class="cmt-actions"><span class="cmt-hint">Ctrl/⌘+Enter 保存</span><button class="cmt-save">保存</button></div>';
-    sec.appendChild(panel);
+            if (ENCRYPTED_KEYS === '__' + 'ENCRYPTED_KEYS__') {
+                console.warn('未配置加密密钥');
+                return null;
+            }
+            // 最多重试 3 次
+            for (let attempt = 0; attempt < 3; attempt++) {
+                const pwd = await showPasswordDialog(
+                    attempt === 0 ? '🔒 需要密码' : '🔒 密码错误，请重试',
+                    '使用 AI 修改需要密码，请向页面作者索取'
+                );
+                if (!pwd) return null;
+                try {
+                    const enc = new TextEncoder();
+                    const pwdHash = await crypto.subtle.digest('SHA-256', enc.encode(pwd));
+                    const keyMaterial = await crypto.subtle.importKey('raw', pwdHash, 'AES-GCM', false, ['decrypt']);
+                    const data = Uint8Array.from(atob(ENCRYPTED_KEYS), c => c.charCodeAt(0));
+                    const iv = data.slice(0, 12);
+                    const ciphertext = data.slice(12);
+                    const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, keyMaterial, ciphertext);
+                    const obj = JSON.parse(new TextDecoder().decode(plain));
+                    // 只缓存 aiKey；同时把这次输入的密码记到 sessionStorage 当 Worker 写密码用
+                    localStorage.setItem('_qbk', btoa(JSON.stringify({ a: obj.a })));
+                    sessionStorage.setItem('_qbpw', pwd);
+                    _cachedKeys = { aiKey: obj.a };
+                    return _cachedKeys;
+                } catch(e) {
+                    // 错误时继续循环，最多 3 次
+                }
+            }
+            return null;
+        }
 
-    // 渲染列表
-    function render(){
-      var list = (data[key] && data[key].items) || [];
-      var $list = panel.querySelector('.cmt-list');
-      $list.innerHTML = '';
-      list.forEach(function(item){
-        var el = document.createElement('div');
-        el.className = 'cmt-item';
-        el.innerHTML = '<span class="cmt-time">' + item.time + '</span>' +
-          escapeHtml(item.text).replace(/\n/g, '<br>') +
-          '<span class="cmt-del" data-id="' + item.id + '" title="删除">✕</span>';
-        $list.appendChild(el);
-      });
-      // 更新按钮状态
-      if (list.length > 0){
-        btn.classList.add('has-comment');
-        btn.innerHTML = '💬<span class="dot">' + list.length + '</span>';
-      } else {
-        btn.classList.remove('has-comment');
-        btn.innerHTML = '💬';
-      }
-      updateBadge();
-    }
+        // ========= 评论写入凭证（昵称 + 写密码）=========
+        // v2.12.0：写 gist 经 Worker 中转。访客需要：(1) 昵称（首次访问弹框）(2) 写密码（首次写时弹框）
+        function getNickname() {
+            return localStorage.getItem('comment_author') || '';
+        }
+        async function ensureNickname() {
+            let name = getNickname();
+            if (name) return name;
+            name = await showInputDialog('👋 请输入您的昵称', '昵称会显示在评论里，方便老板知道是谁说的（仅本机记忆）', '如：汉博 / Leo');
+            if (!name || !name.trim()) return null;
+            name = name.trim().slice(0, 30);
+            localStorage.setItem('comment_author', name);
+            return name;
+        }
+        async function ensureWritePassword(forcePrompt) {
+            let pwd = sessionStorage.getItem('_qbpw');
+            if (pwd && !forcePrompt) return pwd;
+            for (let attempt = 0; attempt < 3; attempt++) {
+                pwd = await showPasswordDialog(
+                    attempt === 0 ? '🔒 需要写权限密码' : '🔒 密码错误，请重试',
+                    '本汇报开放评论需要密码，请向页面作者索取'
+                );
+                if (!pwd) return null;
+                // 探测一次（用一个最小的不修改任何文件的写探测：filename=comments.json + 与现有内容相同的 content）
+                // 简化处理：直接缓存，让真正的写请求自己 401 时再清缓存重弹
+                sessionStorage.setItem('_qbpw', pwd);
+                return pwd;
+            }
+            return null;
+        }
+        function clearWritePassword() {
+            sessionStorage.removeItem('_qbpw');
+        }
+        function showInputDialog(title, hint, placeholder) {
+            return new Promise(resolve => {
+                const existing = document.getElementById('inputDialog');
+                if (existing) existing.remove();
+                const el = document.createElement('div');
+                el.id = 'inputDialog';
+                el.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:99999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(3px);';
+                el.innerHTML = `
+                    <div style="background:white;border-radius:12px;padding:22px 24px;width:360px;max-width:92vw;box-shadow:0 12px 36px rgba(0,0,0,0.3);">
+                        <div style="font-size:15px;font-weight:700;color:#1f2937;margin-bottom:6px;">${title}</div>
+                        <div style="font-size:12px;color:#888;margin-bottom:14px;">${hint || ''}</div>
+                        <input id="textInput" type="text" autocomplete="off" placeholder="${placeholder || ''}" style="width:100%;padding:10px 12px;border:1.5px solid #e0e0e0;border-radius:6px;font-size:13px;outline:none;box-sizing:border-box;" />
+                        <div style="display:flex;gap:10px;margin-top:14px;justify-content:flex-end;">
+                            <button id="textCancel" style="padding:8px 16px;border:1px solid #e0e0e0;background:white;border-radius:6px;font-size:12px;cursor:pointer;color:#666;">取消</button>
+                            <button id="textOk" style="padding:8px 18px;border:none;background:#667eea;color:white;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">确定</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(el);
+                el.addEventListener('click', (ev) => { ev.stopPropagation(); });
+                const input = el.querySelector('#textInput');
+                setTimeout(() => input.focus(), 50);
+                const close = (val) => { el.remove(); resolve(val); };
+                el.querySelector('#textOk').onclick = (ev) => { ev.preventDefault(); ev.stopPropagation(); close(input.value); };
+                el.querySelector('#textCancel').onclick = (ev) => { ev.preventDefault(); ev.stopPropagation(); close(null); };
+                input.addEventListener('keydown', e => {
+                    if (e.key === 'Enter') { e.preventDefault(); close(input.value); }
+                    else if (e.key === 'Escape') { e.preventDefault(); close(null); }
+                });
+            });
+        }
 
-    // 保存
-    function saveComment(){
-      var $ta = panel.querySelector('.cmt-input');
-      var text = $ta.value.trim();
-      if (!text) { $ta.focus(); return; }
-      if (!data[key]) data[key] = { title: getSectionTitle(sec), items: [] };
-      data[key].title = getSectionTitle(sec); // 每次保存时更新标题
-      data[key].items.push({ id: uid(), text: text, time: now() });
-      save(data);
-      $ta.value = '';
-      render();
-      toast('已保存');
-    }
+        // ========= 通过 Worker 读写 gist =========
+        async function gistGet() {
+            // 公开读：无需密码、无需昵称
+            if (WORKER_BASE === '__' + 'WORKER_BASE__') throw new Error('WORKER_BASE 未配置');
+            const res = await fetch(`${WORKER_BASE}/gist`, { method: 'GET' });
+            if (!res.ok) throw new Error('gistGet failed status=' + res.status);
+            return await res.json(); // { files: { 'comments.json': {content, truncated, raw_url, size}, ... } }
+        }
+        async function gistGetFileContent(filename) {
+            const data = await gistGet();
+            const file = data.files && data.files[filename];
+            if (!file) return null;
+            let content = file.content;
+            if (file.truncated && file.raw_url) {
+                try {
+                    const r2 = await fetch(file.raw_url);
+                    if (r2.ok) content = await r2.text();
+                } catch(_) {}
+            }
+            return content;
+        }
+        // 写：必须密码 + 昵称
+        async function gistWrite(filename, contentObjOrStr) {
+            if (WORKER_BASE === '__' + 'WORKER_BASE__') throw new Error('WORKER_BASE 未配置');
+            const nickname = await ensureNickname();
+            if (!nickname) throw new Error('cancelled: no nickname');
+            let pwd = await ensureWritePassword(false);
+            if (!pwd) throw new Error('cancelled: no password');
+            const content = typeof contentObjOrStr === 'string' ? contentObjOrStr : JSON.stringify(contentObjOrStr);
+            const doFetch = async (password) => {
+                return await fetch(`${WORKER_BASE}/gist/file`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password, nickname, filename, content })
+                });
+            };
+            let res = await doFetch(pwd);
+            if (res.status === 401) {
+                clearWritePassword();
+                pwd = await ensureWritePassword(true);
+                if (!pwd) throw new Error('cancelled: no password');
+                res = await doFetch(pwd);
+            }
+            if (!res.ok) {
+                const text = await res.text().catch(() => '');
+                throw new Error(`gistWrite failed ${res.status}: ${text.slice(0,200)}`);
+            }
+            return await res.json();
+        }
 
-    // 展开 / 收起
-    btn.addEventListener('click', function(e){
-      e.stopPropagation();
-      // 关闭其他面板
-      document.querySelectorAll('.cmt-panel.open').forEach(function(p){ if (p!==panel) p.classList.remove('open'); });
-      panel.classList.toggle('open');
-      if (panel.classList.contains('open')){
-        setTimeout(function(){ panel.querySelector('.cmt-input').focus(); }, 50);
-      }
-    });
+        // 兼容旧代码的常量改为getter
+        let currentSection = null;
 
-    panel.addEventListener('click', function(e){ e.stopPropagation(); });
+        const STORAGE_KEY = 'qb_yb_report_comments';
+        const sectionNames = {
+            '_global': '全局（整份汇报）',
+            'cover': '封面',
+            '0.1': '0.1 行业方向',
+            '0.2': '0.2 浏览器自己',
+            '0.3': '0.3 为什么是浏览器',
+            'sec5': '一句话定位',
+            '2': '2 五环节框架',
+            'sec7': '环节 ① 展示层',
+            'sec8': '环节 ② 编辑态召唤',
+            'sec9': '环节 ③ 编辑能力',
+            'sec10': '环节 ④ 副本与去向',
+            'sec11': '环节 ⑤ 上下文引擎',
+            '3': '3 一期闭环',
+            '4': '4 需要哪些资源',
+            '5': '5 自检'
+        };
 
-    panel.querySelector('.cmt-save').addEventListener('click', saveComment);
-    panel.querySelector('.cmt-input').addEventListener('keydown', function(e){
-      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter'){ e.preventDefault(); saveComment(); }
-    });
+        // ========= 评论面板 Tab 切换 =========
+        let currentTab = 'comment'; // 'comment' | 'ai'
+        function switchPanelTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.panel-tab').forEach(b => {
+                b.classList.toggle('active', b.dataset.tab === tab);
+            });
+            document.getElementById('commentSubToolbar').style.display = tab === 'comment' ? 'flex' : 'none';
+            document.getElementById('aiSubToolbar').style.display = tab === 'ai' ? 'block' : 'none';
+            // 退出批量模式
+            if (tab !== 'comment') {
+                document.body.classList.remove('batch-mode');
+                document.getElementById('batchToolbar').style.display = 'none';
+                const btb = document.getElementById('batchToggleBtn');
+                if (btb) { btb.textContent = '批量'; btb.style.background = '#f0f0f0'; btb.style.color = '#666'; }
+            }
+            const ta = document.getElementById('commentInput');
+            const sendBtn = document.getElementById('panelSendBtn');
+            const hint = document.getElementById('commentFooterHint');
+            const isAll = currentScope.kind === 'all';
+            const isGlobal = currentScope.kind === 'global';
+            const isMulti = currentScope.kind === 'multi';
+            const isTarget = currentScope.kind === 'target';
+            const isSection = currentScope.kind === 'section';
 
-    // 删除
-    panel.querySelector('.cmt-list').addEventListener('click', function(e){
-      var del = e.target.closest('.cmt-del');
-      if (!del) return;
-      var id = del.dataset.id;
-      if (!data[key]) return;
-      data[key].items = data[key].items.filter(function(x){ return x.id !== id; });
-      save(data);
-      render();
-      toast('已删除');
-    });
+            if (tab === 'comment') {
+                if (ta) ta.placeholder = isAll ? '请先点某条评论跳转或选择具体元素'
+                    : isGlobal ? '针对整个页面的反馈或整体方向'
+                    : isMulti ? `针对选中的 ${currentMultiItems.length} 项写评论`
+                    : isTarget ? '针对该元素的评论'
+                    : '输入评论...';
+                if (sendBtn) {
+                    sendBtn.textContent = '发送';
+                    sendBtn.style.background = '#667eea';
+                    sendBtn.disabled = isAll;
+                    sendBtn.style.opacity = isAll ? '0.4' : '1';
+                    sendBtn.style.cursor = isAll ? 'not-allowed' : 'pointer';
+                }
+                if (hint) hint.textContent = isAll ? '👀 全部评论视图：只能浏览，发送评论需先点击元素'
+                    : '评论留言不修改页面';
+            } else {
+                // AI Tab：只在 target/multi scope 下能发
+                const canAI = canSendAI();
+                if (ta) ta.placeholder = isMulti ? `批量改 ${currentMultiItems.length} 项，例如："统一改成蓝色"`
+                    : isTarget ? '描述要怎么改，例如：把这里数字改成5w'
+                    : '请先选中具体元素后发起 AI 修改';
+                if (sendBtn) {
+                    sendBtn.textContent = isMulti ? `⚡ 批量 AI 修改 (${currentMultiItems.length})` : '⚡ 用 AI 修改';
+                    sendBtn.style.background = '#667eea';
+                    sendBtn.disabled = !canAI;
+                    sendBtn.style.opacity = canAI ? '1' : '0.4';
+                    sendBtn.style.cursor = canAI ? 'pointer' : 'not-allowed';
+                }
+                if (hint) hint.textContent = canAI
+                    ? (isMulti ? 'AI 会按你的诉求批量改这些元素，每个元素生成一份方案' : 'AI 会实时改 HTML，结果自动同步到云端，可在版本历史回滚')
+                    : '👀 当前只能查看历史 AI 修改记录 · 选中具体元素后才能发起 AI 修改';
+            }
+            renderComments();
+        }
 
-    render();
-  });
+        // 统一的发送入口
+        function panelSend() {
+            if (currentTab === 'comment') return addComment(false);
+            if (currentTab === 'ai') {
+                if (!canSendAI()) { alert('AI 修改只能针对具体元素或多选 · 请先选中某个元素'); return; }
+                return addComment(true);
+            }
+        }
 
-  // 点空白处关面板
-  document.addEventListener('click', function(){
-    document.querySelectorAll('.cmt-panel.open').forEach(function(p){ p.classList.remove('open'); });
-  });
+        // ===== 云端存储（GitHub Gist via Worker）=====
+        async function loadFromCloud() {
+            // v2.12.0：经 Worker 公开读，无需密码/昵称
+            try {
+                const content = await gistGetFileContent(GIST_FILENAME);
+                if (!content) return getLocal();
+                return JSON.parse(content) || {};
+            } catch (e) {
+                console.warn('loadFromCloud 失败，降级 local', e);
+                return getLocal();
+            }
+        }
 
-  // ---------- 导出 ----------
-  function updateBadge(){
-    var total = 0;
-    Object.keys(data).forEach(function(k){ total += (data[k].items || []).length; });
-    var exp = document.getElementById('cmtExport');
-    var badge = document.getElementById('cmtBadge');
-    badge.textContent = total;
-    exp.style.display = total > 0 ? 'flex' : 'none';
-  }
+        async function saveToCloud(comments) {
+            saveLocal(comments);
+            try {
+                await gistWrite(GIST_FILENAME, JSON.stringify(comments, null, 2));
+            } catch (e) {
+                console.warn('saveToCloud 失败', e);
+                if (typeof showTopToast === 'function') {
+                    if (String(e.message).includes('cancelled')) {
+                        showTopToast('未填写昵称或密码，评论已保存到本机但未上云');
+                    } else {
+                        showTopToast('评论上云失败：' + e.message.slice(0, 80));
+                    }
+                }
+            }
+        }
 
-  function buildMarkdown(){
-    var d = load();
-    var keys = Object.keys(d).filter(function(k){ return (d[k].items||[]).length > 0; });
-    if (!keys.length) return '（暂无评论）';
-    var lines = [];
-    lines.push('# ' + TITLE + ' — 评论汇总');
-    lines.push('');
-    lines.push('导出时间：' + now());
-    lines.push('');
-    // 按 key 排序：0.1 / 0.2 / 0.3 / 2 / 3 / 4 / 5 / cover / ...
-    keys.sort(function(a,b){
-      var na = parseFloat(a), nb = parseFloat(b);
-      if (!isNaN(na) && !isNaN(nb)) return na - nb;
-      if (!isNaN(na)) return -1;
-      if (!isNaN(nb)) return 1;
-      return a.localeCompare(b);
-    });
-    keys.forEach(function(k){
-      var s = d[k];
-      lines.push('## [' + k + '] ' + (s.title || ''));
-      lines.push('');
-      s.items.forEach(function(item, i){
-        lines.push('- **' + (i+1) + '. ' + item.time + '**');
-        item.text.split('\n').forEach(function(line){ lines.push('  ' + line); });
-      });
-      lines.push('');
-    });
-    return lines.join('\n');
-  }
+        function getLocal() {
+            try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+            catch(e) { return {}; }
+        }
+        function saveLocal(c) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(c));
+        }
 
-  function exportComments(){
-    var md = buildMarkdown();
-    // 复制到剪贴板
-    var ok = false;
-    try {
-      var ta = document.createElement('textarea');
-      ta.value = md;
-      ta.style.position = 'fixed'; ta.style.opacity = '0';
-      document.body.appendChild(ta);
-      ta.select();
-      ok = document.execCommand('copy');
-      document.body.removeChild(ta);
-    } catch(e){}
-    // 下载 .md 文件
-    try {
-      var blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
-      var a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = '评论_' + new Date().toISOString().slice(0,19).replace(/[:T]/g,'-') + '.md';
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    } catch(e){}
-    toast(ok ? '已复制到剪贴板 · 同时下载 .md 文件' : '已下载 .md 文件');
-  }
+        // ===== 评论扁平化访问层（v2.8） =====
+        // 数据结构：{ all: [{ text,author,time,type,scope,section?,targetId?,targets?,version?,aiResponse? }] }
+        async function loadAllComments() {
+            const data = await loadFromCloud();
+            if (!data || !data.all) return [];
+            return Array.isArray(data.all) ? data.all : [];
+        }
+        async function saveAllComments(list) {
+            await saveToCloud({ all: list });
+        }
+        // 判断一条评论是否属于当前查看范围
+        // scope: { kind:'all' } | { kind:'section', id } | { kind:'target', id } | { kind:'multi', ids:[...] } | { kind:'global' }
+        function commentMatchesScope(c, scope) {
+            if (scope.kind === 'all') return true;
+            if (scope.kind === 'global') return c.scope === 'global';
+            if (scope.kind === 'section') {
+                if (c.scope === 'section' && c.section === scope.id) return true;
+                // 模块也算包含其下子元素的评论？默认不包含，让用户清晰看到层级
+                return false;
+            }
+            if (scope.kind === 'target') {
+                // 直接评论该元素
+                if (c.scope === 'target' && c.targetId === scope.id) return true;
+                // 多选评论里 targets 数组命中该元素
+                if (c.scope === 'multi' && (c.targets || []).some(t => t.targetId === scope.id)) return true;
+                return false;
+            }
+            if (scope.kind === 'multi') {
+                // 完全等价：targets 集合等于本次选区
+                if (c.scope === 'multi') {
+                    const cIds = (c.targets || []).map(t => t.targetId).sort().join(',');
+                    const sIds = scope.ids.slice().sort().join(',');
+                    if (cIds === sIds) return true;
+                }
+                // 任一选区元素的单元素评论也展示出来（提供上下文）
+                if (c.scope === 'target' && scope.ids.includes(c.targetId)) return true;
+                return false;
+            }
+            return false;
+        }
+        // 给一条评论计算"展示标签"
+        function getCommentScopeLabel(c) {
+            if (c.scope === 'global') return '🌐 全局';
+            if (c.scope === 'multi') {
+                const n = (c.targets || []).length;
+                return `🔗 跨${n}项`;
+            }
+            if (c.scope === 'section') return `📦 ${sectionNames[c.section] || c.section}`;
+            if (c.scope === 'target') {
+                const el = document.querySelector(`[data-target-id="${c.targetId}"]`);
+                return el ? getTargetLabel(el) : `🎯 ${c.targetId}`;
+            }
+            return '评论';
+        }
 
-  document.getElementById('cmtExport').addEventListener('click', exportComments);
+        // ===== 业务逻辑 =====
+        function switchStage(n) {
+            document.querySelectorAll('.stage-content').forEach(el => el.classList.remove('active'));
+            document.getElementById('stage-' + n).classList.add('active');
+            document.querySelectorAll('.stage-tab').forEach((el, i) => {
+                if (i + 1 === 1) return;
+                el.classList.remove('active');
+            });
+            const tabs = document.querySelectorAll('.stage-tab');
+            if (n > 1) tabs[n-1].classList.add('active');
+        }
 
-  function escapeHtml(s){ return s.replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; }); }
+        function setView(v, fromAuto) {
+            if (v === 'mobile') {
+                document.body.classList.add('mobile-view');
+            } else {
+                document.body.classList.remove('mobile-view');
+            }
+            document.querySelectorAll('.view-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.view === v);
+            });
+            // 用户手动切的才记忆，自动识别不写 localStorage
+            if (!fromAuto) {
+                localStorage.setItem('view_pref', v);
+            }
+        }
 
-  updateBadge();
-})();
-</script>
+        // 启动时根据 UA + 用户偏好决定默认视图
+        (function autoDetectView() {
+            const saved = localStorage.getItem('view_pref');
+            if (saved === 'pc' || saved === 'mobile') {
+                setView(saved, true);
+                return;
+            }
+            // UA 识别 + 屏幕宽度兜底
+            const ua = navigator.userAgent || '';
+            const isMobile = /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|HarmonyOS/i.test(ua)
+                || (window.matchMedia && window.matchMedia('(max-width: 768px)').matches);
+            setView(isMobile ? 'mobile' : 'pc', true);
+        })();
 
+        async function renderBadges() {
+            const all = await loadAllComments();
+            const isNormal = (c) => !(c.type === 'ai_executed' || c.type === 'ai_pending' || c.type === 'ai_failed' || c.type === 'ai_reverted');
+
+            // 子元素评论计数：scope='target' 直接评论 + scope='multi' 中 targets 命中本元素
+            const targetCounts = {};
+            all.forEach(c => {
+                if (!isNormal(c)) return;
+                if (c.scope === 'target' && c.targetId) {
+                    targetCounts[c.targetId] = (targetCounts[c.targetId] || 0) + 1;
+                } else if (c.scope === 'multi') {
+                    (c.targets || []).forEach(t => {
+                        if (t.targetId) targetCounts[t.targetId] = (targetCounts[t.targetId] || 0) + 1;
+                    });
+                }
+            });
+
+            // 子元素角标
+            document.querySelectorAll('[data-target-id]').forEach(el => {
+                const tid = el.dataset.targetId;
+                const n = targetCounts[tid] || 0;
+                const old = el.querySelector(':scope > .target-flag');
+                if (old) old.remove();
+                el.classList.toggle('has-comments', n > 0);
+                if (n > 0) {
+                    const flag = document.createElement('div');
+                    flag.className = 'target-flag';
+                    flag.textContent = n;
+                    el.appendChild(flag);
+                }
+            });
+
+            // FAB 红点：所有纯评论总数
+            const fab = document.getElementById('globalCommentFab');
+            if (fab) {
+                const totalCount = all.filter(isNormal).length;
+                fab.classList.toggle('has-comments', totalCount > 0);
+                fab.title = totalCount > 0 ? `评论中心（${totalCount}条）` : '评论中心';
+            }
+        }
+
+        // === v2.8: 评论面板的"查看范围" ===
+        // currentScope: { kind: 'all' | 'global' | 'section' | 'target' | 'multi', id?, ids? }
+        // currentSection / currentTarget / currentMultiItems 仅作"发送评论时"的上下文，不再影响渲染过滤
+        let currentTarget = null;
+        let currentMultiItems = null;
+        let currentScope = { kind: 'all' };
+
+        // 用 scope 判定"发送 AI 修改"时操作哪些 DOM
+        // 单元素/多选 scope 时才能 AI 修改；全览/全局/模块时只能评论
+        function canSendAI() {
+            return currentScope.kind === 'target' || currentScope.kind === 'multi';
+        }
+
+        async function openPanel(arg, initialTab) {
+            // v2.11.27：手机端互斥——开侧边面板时关掉底部卡片，避免重叠
+            if (typeof hideMobileCommentCard === 'function') hideMobileCommentCard();
+            // 兼容旧调用：字符串 = sectionId 或 _global
+            if (typeof arg === 'string') {
+                if (arg === '_global') {
+                    currentScope = { kind: 'global' };
+                    currentSection = null; currentTarget = null; currentMultiItems = null;
+                } else {
+                    currentScope = { kind: 'section', id: arg };
+                    currentSection = arg; currentTarget = null; currentMultiItems = null;
+                }
+            } else if (arg && arg.kind === 'all') {
+                currentScope = { kind: 'all' };
+                currentSection = null; currentTarget = null; currentMultiItems = null;
+            } else if (arg && arg.kind === 'global') {
+                currentScope = { kind: 'global' };
+                currentSection = null; currentTarget = null; currentMultiItems = null;
+            } else if (arg && arg.kind === 'target') {
+                const el = arg.el;
+                const sectionEl = el.closest('.commentable[data-section]');
+                currentSection = sectionEl ? sectionEl.dataset.section : null;
+                currentTarget = el.dataset.targetId;
+                currentMultiItems = null;
+                currentScope = { kind: 'target', id: currentTarget };
+            } else if (arg && arg.kind === 'multi') {
+                currentSection = null;
+                currentTarget = null;
+                currentMultiItems = arg.items;
+                currentScope = { kind: 'multi', ids: arg.items.map(t => t.targetId) };
+            }
+
+            // 设置面板标题
+            const titleEl = document.getElementById('panelTitle');
+            if (currentScope.kind === 'all') {
+                titleEl.textContent = '评论中心 · 全部';
+            } else if (currentScope.kind === 'global') {
+                titleEl.textContent = '🌐 全局评论';
+            } else if (currentScope.kind === 'section') {
+                titleEl.textContent = `📦 ${sectionNames[currentSection] || currentSection}`;
+            } else if (currentScope.kind === 'target') {
+                const el = document.querySelector(`[data-target-id="${currentTarget}"]`);
+                titleEl.textContent = el ? getTargetLabel(el) : '评论';
+            } else if (currentScope.kind === 'multi') {
+                titleEl.textContent = `🔗 跨元素 · ${currentMultiItems.length} 项`;
+            }
+
+            document.getElementById('commentPanel').classList.add('open');
+            document.body.classList.add('panel-open');
+            switchPanelTab(initialTab || 'comment');
+            // 静默尝试加载已缓存的密钥（不弹密码框）
+            await ensureKeys();
+            await renderComments();
+        }
+
+        function closePanel() {
+            document.getElementById('commentPanel').classList.remove('open');
+            document.body.classList.remove('panel-open', 'panel-expanded');
+            currentSection = null;
+            currentTarget = null;
+            currentMultiItems = null;
+            currentScope = { kind: 'all' };
+            // 关闭面板的同时清掉选区高亮
+            document.querySelectorAll('.selected-target').forEach(el => el.classList.remove('selected-target'));
+            selectedTargets = [];
+            document.body.classList.remove('selection-mode');
+        }
+
+        async function renderComments() {
+            const all = await loadAllComments();
+            const body = document.getElementById('panelBody');
+            const isBatch = document.body.classList.contains('batch-mode');
+
+            // 按 scope 过滤
+            let filtered = all.map((c, originalIdx) => ({ c, originalIdx }))
+                .filter(({c}) => commentMatchesScope(c, currentScope));
+
+            // 再按 Tab 过滤
+            filtered = filtered.filter(({c}) => {
+                const isAIRecord = c.type === 'ai_executed' || c.type === 'ai_pending' || c.type === 'ai_failed' || c.type === 'ai_reverted';
+                return currentTab === 'ai' ? isAIRecord : !isAIRecord;
+            });
+
+            // 时间倒序（最新在上）
+            filtered.sort((a, b) => {
+                const ta = new Date(a.c.time).getTime() || 0;
+                const tb = new Date(b.c.time).getTime() || 0;
+                return tb - ta;
+            });
+
+            // 全览态保留一个简单计数；其他场景不再有蓝色引用框（用户嫌冗余）
+            let scopeBanner = '';
+            if (currentScope.kind === 'all') {
+                scopeBanner = `<div style="padding:6px 10px;background:#fafafa;border-radius:6px;margin-bottom:10px;font-size:11px;color:#888;">
+                    📋 全部评论 · 共 ${filtered.length} 条
+                </div>`;
+            }
+
+            if (filtered.length === 0) {
+                const emptyHint = currentTab === 'ai'
+                    ? (canSendAI() ? '可在下方输入 AI 修改诉求' : '没有 AI 修改记录 · 选中具体元素后才能发起 AI 修改')
+                    : '暂无评论，写下你的想法';
+                body.innerHTML = scopeBanner + `<div style="text-align:center;padding:24px;color:#999;font-size:12px;">${emptyHint}</div>`;
+                return;
+            }
+            body.innerHTML = scopeBanner + filtered.map(({c, originalIdx}) => {
+                const i = originalIdx;
+                const isAI = c.type === 'ai_executed';
+                const isPending = c.type === 'ai_pending';
+                const isFailed = c.type === 'ai_failed';
+                const isReverted = c.type === 'ai_reverted';
+                let bgColor = '#f8f8f8';
+                let badge = '';
+                let extraBtn = '';
+                if (isAI) { bgColor = '#f0f7ff'; badge = `<span style="background:#667eea;color:white;font-size:9px;padding:2px 6px;border-radius:3px;margin-left:6px;">⚡ AI已执行 v${c.version || '?'}</span>`; }
+                if (isPending) {
+                    bgColor = '#fffbe6';
+                    badge = `<span style="background:#faad14;color:white;font-size:9px;padding:2px 6px;border-radius:3px;margin-left:6px;">⏳ 正在处理中</span>`;
+                    extraBtn = `<button onclick="retryComment(${i})" style="margin-top:4px;font-size:10px;padding:2px 8px;background:transparent;color:#888;border:1px solid #ccc;border-radius:3px;cursor:pointer;">如长时间无响应，点击重试</button>`;
+                }
+                if (isFailed) { bgColor = '#fff1f0'; badge = `<span style="background:#ff4d4f;color:white;font-size:9px;padding:2px 6px;border-radius:3px;margin-left:6px;">❌ 失败</span>`;
+                    extraBtn = `<button onclick="retryComment(${i})" style="margin-top:4px;font-size:10px;padding:2px 8px;background:transparent;color:#667eea;border:1px solid #667eea;border-radius:3px;cursor:pointer;">重试</button>`;
+                }
+                if (isReverted) { bgColor = '#fafafa'; badge = `<span style="background:#999;color:white;font-size:9px;padding:2px 6px;border-radius:3px;margin-left:6px;">↩️ 已撤回</span>`; }
+
+                // 显示该评论的 scope 标签
+                const scopeTag = `<span style="font-size:9px;padding:2px 6px;background:white;border:1px solid #d0d4ea;color:#667eea;border-radius:3px;cursor:pointer;" onclick="jumpToCommentTarget(${i})" title="跳到该元素">${getCommentScopeLabel(c).replace(/</g,'&lt;')}</span>`;
+
+                // 多选评论的额外 targets 详情（除主 scope 标签外，其他元素也列出来）
+                let extraTargets = '';
+                if (c.scope === 'multi' && c.targets && c.targets.length > 1) {
+                    extraTargets = `<div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:4px;">${c.targets.map(t => `<span style="font-size:9px;padding:2px 6px;background:#f5f5f7;color:#666;border-radius:3px;">${(t.label || '元素').replace(/</g,'&lt;')}</span>`).join('')}</div>`;
+                }
+
+                const checkbox = isBatch ? `<input type="checkbox" class="batch-cb" data-idx="${i}" onchange="updateBatchCount()" style="margin-right:8px;cursor:pointer;vertical-align:middle;">` : '';
+                const deleteBtn = isBatch ? '' : `<button style="position:absolute;right:8px;top:8px;font-size:10px;color:#ccc;cursor:pointer;border:none;background:none;" onclick="deleteComment(${i})">删除</button>`;
+
+                return `
+                <div style="padding:10px 12px;background:${bgColor};border-radius:8px;margin-bottom:8px;position:relative;display:flex;align-items:flex-start;">
+                    ${checkbox}
+                    <div style="flex:1;min-width:0;">
+                        ${deleteBtn}
+                        <div style="font-size:9px;color:#999;margin-bottom:3px;">${c.author || '匿名'} · ${c.time}${badge}</div>
+                        <div style="margin-bottom:4px;">${scopeTag}</div>
+                        <div style="font-size:12px;color:#333;line-height:1.5;">${c.text.replace(/</g,'&lt;')}</div>
+                        ${extraTargets}
+                        ${c.aiResponse ? `<div style="margin-top:6px;padding:6px 8px;background:white;border-radius:4px;font-size:11px;color:#666;border-left:2px solid #667eea;">${c.aiResponse.replace(/</g,'&lt;')}</div>` : ''}
+                        ${extraBtn}
+                    </div>
+                </div>`;
+            }).join('');
+            if (isBatch) updateBatchCount();
+        }
+
+        // 点击评论里的 scope 标签：跳到对应元素并切到该元素的 scope
+        async function jumpToCommentTarget(idx) {
+            const all = await loadAllComments();
+            const c = all[idx];
+            if (!c) return;
+            if (c.scope === 'target' && c.targetId) {
+                const el = document.querySelector(`[data-target-id="${c.targetId}"]`);
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // 闪烁高亮提示
+                    el.style.transition = 'outline 0.3s';
+                    el.style.outline = '3px solid #667eea';
+                    setTimeout(() => { el.style.outline = ''; }, 1200);
+                    openPanel({ kind: 'target', el });
+                }
+            } else if (c.scope === 'section' && c.section) {
+                const el = document.querySelector(`[data-section="${c.section}"]`);
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    el.style.transition = 'outline 0.3s';
+                    el.style.outline = '3px solid #667eea';
+                    setTimeout(() => { el.style.outline = ''; }, 1200);
+                    openPanel(c.section);
+                }
+            } else if (c.scope === 'multi' && c.targets && c.targets.length > 0) {
+                // 重建多选状态
+                exitSelectionMode();
+                c.targets.forEach(t => {
+                    const el = document.querySelector(`[data-target-id="${t.targetId}"]`);
+                    if (el) toggleTargetSelection(el);
+                });
+                openMultiSelectPanel('comment');
+            }
+        }
+
+        async function retryComment(idx) {
+            const all = await loadAllComments();
+            const c = all[idx];
+            if (!c) return;
+            const text = c.text;
+            const author = c.author;
+
+            const setBtnState = (loading) => {
+                const btns = document.querySelectorAll('.panel-footer button');
+                btns.forEach(b => b.disabled = loading);
+            };
+            setBtnState(true);
+
+            try {
+                let result;
+                if (c.scope === 'multi' && c.targets && c.targets.length > 0) {
+                    result = await callAIToModifyMulti(text, c.targets);
+                    applyAIResultMulti(result);
+                } else if (c.scope === 'target' && c.targetId) {
+                    const targetEl = document.querySelector(`[data-target-id="${c.targetId}"]`);
+                    if (!targetEl) throw new Error('找不到目标元素');
+                    result = await callAIToModifyTarget(text, targetEl);
+                    applyAIResult(result, targetEl);
+                } else {
+                    throw new Error('该评论 scope 不支持 AI 修改');
+                }
+                const versionNum = await saveVersion(text, author, c.section || null);
+                const all2 = await loadAllComments();
+                all2[idx].type = 'ai_executed';
+                all2[idx].version = versionNum;
+                all2[idx].aiResponse = `${(result && result.summary) || '已修改'}（重试成功）`;
+                await saveAllComments(all2);
+            } catch (e) {
+                console.error('重试失败:', e);
+                const all2 = await loadAllComments();
+                if (all2[idx]) {
+                    all2[idx].type = 'ai_failed';
+                    all2[idx].aiResponse = '重试失败：' + e.message;
+                    await saveAllComments(all2);
+                }
+                alert('重试失败：' + e.message);
+            } finally {
+                setBtnState(false);
+                await renderComments();
+                await renderBadges();
+            }
+        }
+
+        // ===================================================================
+        // v2.11：浮动小气泡 + inline 输入 + 顶部 toast
+        // ===================================================================
+        let bubbleMode = 'comment'; // 'comment' | 'ai'
+
+        function showBubbleToolbar(anchorEl) {
+            const tb = document.getElementById('bubbleToolbar');
+            // AI 修改按钮的可用性
+            const aiBtn = tb.querySelector('button[data-bubble-action="ai"]');
+            const canAI = isInSelectionMode();
+            if (aiBtn) {
+                aiBtn.style.opacity = canAI ? '1' : '0.4';
+                aiBtn.style.cursor = canAI ? 'pointer' : 'not-allowed';
+                aiBtn.disabled = !canAI;
+            }
+            // 隐藏输入框（如果开着）
+            hideBubbleInput();
+            tb.classList.add('show');
+            positionBubble(tb, anchorEl);
+        }
+
+        function hideBubbleToolbar() {
+            const tb = document.getElementById('bubbleToolbar');
+            if (tb) tb.classList.remove('show');
+        }
+
+        function positionBubble(elBubble, anchor) {
+            // 让气泡显示在元素正上方；不够空间则放下方
+            const r = anchor.getBoundingClientRect();
+            const sx = window.scrollX || window.pageXOffset;
+            const sy = window.scrollY || window.pageYOffset;
+            elBubble.style.visibility = 'hidden';
+            elBubble.style.left = '0px'; elBubble.style.top = '0px';
+            // 强制 reflow
+            void elBubble.offsetWidth;
+            const bw = elBubble.offsetWidth;
+            const bh = elBubble.offsetHeight;
+            const vw = document.documentElement.clientWidth;
+            // 默认在元素上方
+            let top = r.top + sy - bh - 10;
+            let left = r.left + sx;
+            const aboveOk = (r.top - bh - 10) > 0;
+            if (!aboveOk) {
+                // 放下方
+                top = r.bottom + sy + 10;
+                elBubble.classList.add('below');
+            } else {
+                elBubble.classList.remove('below');
+            }
+            // 横向边界保护
+            if (left + bw > sx + vw - 8) left = sx + vw - bw - 8;
+            if (left < sx + 8) left = sx + 8;
+            elBubble.style.left = left + 'px';
+            elBubble.style.top = top + 'px';
+            elBubble.style.visibility = '';
+        }
+
+        function openBubbleInput(mode) {
+            if (mode === 'ai' && !isInSelectionMode()) return;
+            bubbleMode = mode;
+            const ti = document.getElementById('bubbleInput');
+            const label = document.getElementById('biModeLabel');
+            const scopeLabel = document.getElementById('biScopeLabel');
+            const tipText = document.getElementById('biTipText');
+            const ta = document.getElementById('bubbleInputText');
+            const sendBtn = document.getElementById('biSendBtn');
+            if (mode === 'ai') {
+                label.textContent = '✨ AI 修改';
+                label.style.background = '#fef3c7';
+                label.style.color = '#b45309';
+                ta.placeholder = selectedTargets.length > 1
+                    ? `批量改 ${selectedTargets.length} 项，例如："统一改成蓝色"`
+                    : '描述要怎么改，例如：把这里数字改成5w';
+                tipText.textContent = '点【发送】按钮提交 · 实时改 HTML';
+                sendBtn.textContent = '⚡ 发送';
+                sendBtn.style.background = '#f59e0b';
+            } else {
+                label.textContent = '💬 评论';
+                label.style.background = '#eef2ff';
+                label.style.color = '#4f46e5';
+                ta.placeholder = selectedTargets.length > 1
+                    ? `针对选中的 ${selectedTargets.length} 项写评论`
+                    : '针对该元素的评论';
+                tipText.textContent = '点【发送】按钮提交';
+                sendBtn.textContent = '发送';
+                sendBtn.style.background = '#667eea';
+            }
+            scopeLabel.textContent = `已选 ${selectedTargets.length} 项`;
+            ta.value = '';
+            // 显示并定位（贴在最后一个选中元素旁）
+            const last = selectedTargets[selectedTargets.length - 1];
+            if (!last) return;
+            const el = document.querySelector(last.selector);
+            if (!el) return;
+            // 隐藏 toolbar，显示输入框
+            hideBubbleToolbar();
+            ti.classList.add('show');
+            positionBubble(ti, el);
+            setTimeout(() => ta.focus(), 10);
+        }
+
+        // 仅关闭输入框，不动选区/工具栏（供 showBubbleToolbar 内部互调避免递归）
+        function hideBubbleInput() {
+            const ti = document.getElementById('bubbleInput');
+            if (ti) ti.classList.remove('show');
+        }
+
+        // v2.11.19：取消按钮 → 彻底回默认态（关输入框 + 关工具栏 + 清选区）
+        function cancelBubbleInput() {
+            hideBubbleInput();
+            hideBubbleToolbar();
+            exitSelectionMode();
+        }
+
+        async function bubbleSubmit() {
+            const ta = document.getElementById('bubbleInputText');
+            const text = (ta.value || '').trim();
+            // v2.11.19：空内容点发送 = 无响应（不关闭、不清选区）
+            if (!text) return;
+            const useAI = (bubbleMode === 'ai');
+            if (useAI && !isInSelectionMode()) {
+                showTopToast('请先选中具体元素再发起 AI 修改');
+                return;
+            }
+            // 把选区写进 currentScope（不开面板）
+            // v2.11.17：单元素优先走 target scope（AI 单元素 prompt 更精准），多元素走 multi
+            if (selectedTargets.length === 1) {
+                const t = selectedTargets[0];
+                currentSection = t.section || null;
+                currentTarget = t.targetId;
+                currentMultiItems = null;
+                currentScope = { kind: 'target', id: t.targetId };
+            } else {
+                currentSection = null;
+                currentTarget = null;
+                currentMultiItems = selectedTargets.slice();
+                currentScope = { kind: 'multi', ids: currentMultiItems.map(t => t.targetId) };
+            }
+            // 灌值进 commentInput，复用 addComment
+            const ci = document.getElementById('commentInput');
+            ci.value = text;
+            // v2.11.19：发送后立即回默认态（关输入框 + 关工具栏 + 清选区）
+            const ti = document.getElementById('bubbleInput');
+            if (ti) ti.classList.remove('show');
+            hideBubbleToolbar();
+            // 注意：清选区后 bubbleSubmit 内部还要用 currentScope/currentMultiItems，已经在上面拷过快照，OK
+            exitSelectionMode();
+            // 给个轻反馈
+            const sendBtn = document.getElementById('biSendBtn');
+            if (sendBtn) sendBtn.disabled = true;
+            try {
+                if (useAI) {
+                    // v2.11.24：AI 修改必须先解锁密钥，再弹 toast。否则弹窗会被 toast 遮挡
+                    const k = await unlockKeys();
+                    if (!k) {
+                        if (sendBtn) sendBtn.disabled = false;
+                        showTopToast('已取消 AI 修改', 2500);
+                        return;
+                    }
+                    showTopToast('AI 修改指令已发送，请稍等，进度可在 <a onclick="openAITabFromToast()">【AI 修改】</a> tab 里查看');
+                }
+                await addComment(useAI);
+            } finally {
+                if (sendBtn) sendBtn.disabled = false;
+            }
+        }
+
+        // 顶部 toast
+        let _toastTimer = null;
+        function showTopToast(html, ms) {
+            const t = document.getElementById('topToast');
+            if (!t) return;
+            t.innerHTML = html;
+            t.classList.add('show');
+            if (_toastTimer) clearTimeout(_toastTimer);
+            _toastTimer = setTimeout(() => t.classList.remove('show'), ms || 6000);
+        }
+
+        // toast 里点【AI 修改】超链接 → 拉起 AI tab
+        function openAITabFromToast() {
+            const t = document.getElementById('topToast');
+            if (t) t.classList.remove('show');
+            // 用全部 scope 打开面板，切到 AI tab
+            openPanel({ kind: 'all' }, 'ai');
+        }
+
+        // 手机端只读态点元素时的提示（每个设备只弹一次，与新手引导同逻辑）
+        const ANNOTATE_HINT_KEY = 'qb_annotate_hint_shown';
+        function maybeShowAnnotateHint() {
+            if (localStorage.getItem(ANNOTATE_HINT_KEY)) return;
+            localStorage.setItem(ANNOTATE_HINT_KEY, '1');
+            showTopToast('需要评论？请 <a onclick="enableAnnotateFromToast()">【切换】</a> 至批注模式', 8000);
+        }
+        function enableAnnotateFromToast() {
+            const t = document.getElementById('topToast');
+            if (t) t.classList.remove('show');
+            // 如果当前是只读态，切换为批注态
+            if (!document.body.classList.contains('show-comments')) {
+                toggleCommentVisibility();
+            }
+        }
+
+        // v2.11.11：所有输入框完全屏蔽 Enter（既不发送也不换行），发送只能点按钮
+        document.addEventListener('keydown', (e) => {
+            if (e.key !== 'Enter') return;
+            const t = e.target;
+            if (!t) return;
+            const tag = (t.tagName || '').toLowerCase();
+            if (tag === 'textarea' || tag === 'input') {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        }, true);
+
+        // 输入框：发送只能点按钮（Enter 已被全局屏蔽）
+        document.addEventListener('DOMContentLoaded', () => {
+            // 工具栏按钮：用 capture 监听 + stopPropagation，确保不被 document click handler 截胡
+            const tb = document.getElementById('bubbleToolbar');
+            if (tb) {
+                tb.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const btn = e.target.closest('button[data-bubble-action]');
+                    if (!btn) return;
+                    if (btn.disabled) return;
+                    const action = btn.dataset.bubbleAction;
+                    openBubbleInput(action);
+                }, true);
+                // 阻止 mousedown 触发框选/选中切换
+                tb.addEventListener('mousedown', (e) => {
+                    e.stopPropagation();
+                    e.preventDefault(); // 不让 button 失焦
+                }, true);
+            }
+            // bubbleInput 容器：用 capture 阶段直接监听 button click（数据驱动，不依赖 inline onclick）
+            const ti = document.getElementById('bubbleInput');
+            if (ti) {
+                ti.addEventListener('click', (e) => {
+                    const btn = e.target.closest('button[data-bi-action]');
+                    if (!btn) return;
+                    e.stopPropagation(); // 阻止冒泡到 document，避免误触退出选区等
+                    const action = btn.dataset.biAction;
+                    if (action === 'cancel') cancelBubbleInput();
+                    else if (action === 'send') bubbleSubmit();
+                }, true);
+            }
+        });
+
+        // 滚动/resize 时如果气泡显示中，重新定位
+        let _bubbleRepositionRaf = null;
+        function _scheduleReposition() {
+            if (_bubbleRepositionRaf) return;
+            _bubbleRepositionRaf = requestAnimationFrame(() => {
+                _bubbleRepositionRaf = null;
+                if (!isInSelectionMode()) return;
+                const last = selectedTargets[selectedTargets.length - 1];
+                if (!last) return;
+                const el = document.querySelector(last.selector);
+                if (!el) return;
+                const tb = document.getElementById('bubbleToolbar');
+                const ti = document.getElementById('bubbleInput');
+                if (tb && tb.classList.contains('show')) positionBubble(tb, el);
+                if (ti && ti.classList.contains('show')) positionBubble(ti, el);
+            });
+        }
+        window.addEventListener('scroll', _scheduleReposition, true);
+        window.addEventListener('resize', _scheduleReposition);
+
+        // ===================================================================
+        // v2.11.10：移动端真实视口高度 --vh 动态适配
+        // 解决 Chrome / Safari 移动端底 bar 收起/展开导致的高度跳变 + 留白问题
+        // ===================================================================
+        function _updateVH() {
+            // 优先用 visualViewport（最准），fallback 用 innerHeight
+            const h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+            // --vh = 1% 视口高度，calc(var(--vh)*70) 即 70% 真实视口
+            document.documentElement.style.setProperty('--vh', (h / 100) + 'px');
+        }
+        _updateVH();
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', _updateVH);
+            window.visualViewport.addEventListener('scroll', _updateVH);
+        }
+        window.addEventListener('resize', _updateVH);
+        window.addEventListener('orientationchange', () => setTimeout(_updateVH, 100));
+
+        // ===================================================================
+        // v2.11.2：手机端评论卡片（底部抽屉，单元素 list+输入）
+        // ===================================================================
+        let mobileCardTarget = null; // 当前卡片绑定的 target 元素
+
+        async function openMobileCommentCard(targetEl) {
+            // v2.11.27：手机端互斥——开底部卡片前关掉侧边面板，避免重叠
+            if (typeof closePanel === 'function') {
+                const panelEl = document.getElementById('commentPanel');
+                if (panelEl && panelEl.classList.contains('open')) closePanel();
+            }
+            mobileCardTarget = targetEl;
+            const tid = targetEl.dataset.targetId;
+            const sectionEl = targetEl.closest('.commentable[data-section]');
+            const section = sectionEl ? sectionEl.dataset.section : null;
+            // 设置 currentScope 为 target，让 addComment 复用
+            currentScope = { kind: 'target', id: tid };
+            currentSection = section;
+            currentTarget = tid;
+            currentMultiItems = null;
+            // 标题
+            document.getElementById('mccTitle').textContent = getTargetLabel(targetEl);
+            // 渲染评论 list
+            await renderMobileCardList();
+            // 清空输入
+            document.getElementById('mccInput').value = '';
+            // 显示
+            const card = document.getElementById('mobileCommentCard');
+            card.classList.add('show');
+            document.body.classList.add('mobile-card-open');
+            setTimeout(() => document.getElementById('mccInput').focus(), 300);
+        }
+
+        function hideMobileCommentCard() {
+            const card = document.getElementById('mobileCommentCard');
+            if (!card) return;
+            card.classList.remove('show');
+            document.body.classList.remove('mobile-card-open');
+            mobileCardTarget = null;
+        }
+
+        async function renderMobileCardList() {
+            if (!mobileCardTarget) return;
+            const tid = mobileCardTarget.dataset.targetId;
+            const list = document.getElementById('mccList');
+            const all = await loadAllComments();
+            // 过滤：targetId 匹配，或 targets 数组里包含
+            const filtered = all.filter(c => {
+                if (c.targetId === tid) return true;
+                if (Array.isArray(c.targets) && c.targets.some(t => t.targetId === tid)) return true;
+                return false;
+            });
+            if (filtered.length === 0) {
+                list.innerHTML = `<div class="mcc-empty">暂无评论，写下第一条吧</div>`;
+                return;
+            }
+            list.innerHTML = filtered.map(c => {
+                const isAI = c.type === 'ai_executed';
+                const isPending = c.type === 'ai_pending';
+                const isFailed = c.type === 'ai_failed';
+                const cls = isAI ? 'ai' : '';
+                const badge = isAI ? `<span class="mcc-badge">⚡ AI v${c.version || '?'}</span>`
+                    : isPending ? `<span class="mcc-badge" style="background:#f59e0b;color:white;">AI 执行中</span>`
+                    : isFailed ? `<span class="mcc-badge" style="background:#ff4d4f;color:white;">AI 失败</span>` : '';
+                const text = (c.text || '').replace(/</g, '&lt;');
+                const aiResp = c.aiResponse ? `<div style="margin-top:6px;padding:6px 8px;background:#f0f7ff;border-radius:5px;font-size:11px;color:#555;">${(c.aiResponse || '').replace(/</g, '&lt;')}</div>` : '';
+                return `<div class="mcc-item ${cls}">
+                    <div>${text}${badge}</div>
+                    ${aiResp}
+                    <div class="mcc-meta"><span>${c.author || '匿名'}</span><span>${c.time || ''}</span></div>
+                </div>`;
+            }).join('');
+            // 自动滚到底
+            list.scrollTop = list.scrollHeight;
+        }
+
+        async function submitMobileComment(useAI) {
+            const ta = document.getElementById('mccInput');
+            const text = (ta.value || '').trim();
+            if (!text) return;
+            if (!mobileCardTarget) return;
+            // 灌进 commentInput 复用 addComment
+            const ci = document.getElementById('commentInput');
+            ci.value = text;
+            // 锁按钮
+            const cBtn = document.getElementById('mccBtnComment');
+            const aBtn = document.getElementById('mccBtnAI');
+            cBtn.disabled = true; aBtn.disabled = true;
+            const origCText = cBtn.textContent;
+            const origAText = aBtn.textContent;
+            if (useAI) {
+                aBtn.textContent = 'AI 执行中...';
+                showTopToast('AI 修改指令已发送，请稍等');
+            } else {
+                cBtn.textContent = '发送中...';
+            }
+            try {
+                await addComment(useAI);
+                ta.value = '';
+                // 刷新 list
+                await renderMobileCardList();
+            } finally {
+                cBtn.disabled = false; aBtn.disabled = false;
+                cBtn.textContent = origCText;
+                aBtn.textContent = origAText;
+            }
+        }
+
+        // 卡片：不在 capture 阶段 stopPropagation（会阻止内部按钮 onclick 触发）
+        // document 顶部已经把 #mobileCommentCard 加进白名单 return，无需重复拦截
+
+        async function addComment(useAI) {
+            const input = document.getElementById('commentInput');
+            const text = input.value.trim();
+            if (!text) return;
+            // scope=all 时不能直接发送评论（要选个对象）；这里禁止：让用户先选择
+            if (currentScope.kind === 'all') {
+                alert('在"全部"视图下不能直接发送评论。请：\n· 点某条评论的标签跳转到对应元素\n· 或点击具体子元素 / ⌘多选');
+                return;
+            }
+            // AI 修改只在 target 或 multi scope 下可用
+            if (useAI && !canSendAI()) {
+                alert('AI 修改只能针对具体元素或多选 · 请先选中某个元素');
+                return;
+            }
+
+            // 评论 = 静默尝试解锁；AI 修改 = 强制解锁
+            let k;
+            if (useAI) {
+                k = await unlockKeys();
+                if (!k) { alert('AI 修改需要先验证密码'); return; }
+            } else {
+                k = await ensureKeys();
+            }
+
+            let author = await ensureNickname();
+            if (!author) { alert('请先填写昵称'); return; }
+
+            const setBtnState = (loading) => {
+                const btn = document.getElementById('panelSendBtn');
+                if (btn) {
+                    btn.disabled = loading;
+                    btn.style.opacity = loading ? '0.6' : '1';
+                    btn.textContent = loading
+                        ? (useAI ? 'AI 执行中...' : '发送中...')
+                        : (useAI ? '⚡ 用 AI 修改' : '发送');
+                }
+            };
+            setBtnState(true);
+
+            // 构造一条扁平化评论
+            const newComment = {
+                text, author,
+                time: new Date().toLocaleString('zh-CN'),
+                type: useAI ? 'ai_pending' : 'normal',
+                scope: currentScope.kind, // global/section/target/multi
+                targets: []
+            };
+            if (currentScope.kind === 'section') {
+                newComment.section = currentSection;
+            } else if (currentScope.kind === 'target') {
+                newComment.targetId = currentTarget;
+                newComment.section = currentSection;
+                const el = document.querySelector(`[data-target-id="${currentTarget}"]`);
+                newComment.targets = [{
+                    section: currentSection, targetId: currentTarget,
+                    label: el ? getTargetLabel(el) : '元素',
+                    selector: `[data-target-id="${currentTarget}"]`
+                }];
+            } else if (currentScope.kind === 'multi') {
+                newComment.targets = currentMultiItems.map(t => ({
+                    section: t.section, targetId: t.targetId, label: t.label, selector: t.selector
+                }));
+            }
+
+            try {
+                const all = await loadAllComments();
+                all.push(newComment);
+                const commentIdx = all.length - 1;
+                await saveAllComments(all);
+                input.value = '';
+                await renderComments();
+                await renderBadges();
+
+                if (useAI) {
+                    try {
+                        const sectionForBackup = currentSection || (newComment.targets[0] && newComment.targets[0].section) || null;
+                        // v2.11.21：只存操作前 snapshot（供回滚用），不再存操作后。
+                        // 回滚=恢复该 snapshot（即回到操作前状态）
+                        const versionNum = await saveVersion(text, author, sectionForBackup);
+
+                        let result;
+                        if (currentScope.kind === 'multi') {
+                            result = await callAIToModifyMulti(text, currentMultiItems);
+                            applyAIResultMulti(result);
+                        } else if (currentScope.kind === 'target') {
+                            const targetEl = document.querySelector(`[data-target-id="${currentTarget}"]`);
+                            if (!targetEl) throw new Error('找不到目标元素');
+                            result = await callAIToModifyTarget(text, targetEl);
+                            applyAIResult(result, targetEl);
+                        }
+
+                        // v2.11.23：AI 改完后把当前 DOM 存 latest.json，刷新后恢复用
+                        await saveLatestSnapshot();
+
+                        const all2 = await loadAllComments();
+                        all2[commentIdx].type = 'ai_executed';
+                        all2[commentIdx].version = versionNum;
+                        all2[commentIdx].aiResponse = `${(result && result.summary) || '已修改'}（可在版本历史中回滚）`;
+                        await saveAllComments(all2);
+                    } catch (e) {
+                        console.error('AI修改失败:', e);
+                        const all2 = await loadAllComments();
+                        if (all2[commentIdx]) {
+                            all2[commentIdx].type = 'ai_failed';
+                            all2[commentIdx].aiResponse = '执行失败：' + e.message;
+                            await saveAllComments(all2);
+                        }
+                        alert('AI执行失败：' + e.message);
+                    }
+                }
+            } finally {
+                setBtnState(false);
+                try {
+                    await renderComments();
+                    await renderBadges();
+                } catch(e) { console.warn('刷新失败', e); }
+                // 多选 AI 发送成功后退出多选态
+                if (useAI && currentScope.kind === 'multi') {
+                    currentMultiItems = null;
+                    exitSelectionMode();
+                }
+            }
+        }
+
+        function applyAIResult(result, sectionEl) {
+            if (!result || !result.action) throw new Error('AI返回方案无法识别');
+            const sel = result.target_selector;
+            if (!sel) throw new Error('AI未返回target_selector');
+
+            // 查找目标：1) 先在sectionEl内部找子节点 2) 检查是否就是sectionEl自己 3) 兜底全局查
+            let targets = Array.from(sectionEl.querySelectorAll(sel));
+            if (targets.length === 0) {
+                // 检查sectionEl自身是否匹配（用于"删掉外层框"等场景）
+                try { if (sectionEl.matches(sel)) targets = [sectionEl]; } catch(e) {}
+            }
+            if (targets.length === 0) {
+                // 去掉运行时类（has-comments / has-edit-notes）后重试
+                const cleanSel = sel.replace(/\.has-comments|\.has-edit-notes/g, '');
+                if (cleanSel !== sel) {
+                    targets = Array.from(sectionEl.querySelectorAll(cleanSel));
+                    if (targets.length === 0) {
+                        try { if (sectionEl.matches(cleanSel)) targets = [sectionEl]; } catch(e) {}
+                    }
+                }
+            }
+            if (targets.length === 0) throw new Error('选择器未匹配：' + sel);
+            const el = targets[0];
+
+            switch(result.action) {
+                case 'replace_text':
+                    el.textContent = result.new_text || '';
+                    break;
+                case 'replace_html':
+                    el.innerHTML = result.new_html || '';
+                    break;
+                case 'remove':
+                    // 不允许删除整个 commentable 模块（避免AI误判把整块删掉）
+                    if (el === sectionEl) throw new Error('不能删除整个模块容器，请明确删除内部具体元素');
+                    el.remove();
+                    break;
+                case 'insert_before':
+                    el.insertAdjacentHTML('beforebegin', result.new_html || '');
+                    break;
+                case 'insert_after':
+                    el.insertAdjacentHTML('afterend', result.new_html || '');
+                    break;
+                case 'set_attr':
+                    if (!result.attr_name) throw new Error('set_attr 缺 attr_name');
+                    if (result.attr_value === '' || result.attr_value == null) el.removeAttribute(result.attr_name);
+                    else el.setAttribute(result.attr_name, result.attr_value);
+                    break;
+                default:
+                    throw new Error('未知action: ' + result.action);
+            }
+        }
+
+        // 公共：剥离运行时class和动态注入元素
+        function stripRuntimeForAI(root) {
+            const runtimeClasses = ['has-comments', 'has-edit-notes', 'open', 'active', 'selected-target'];
+            root.querySelectorAll('*').forEach(n => {
+                runtimeClasses.forEach(c => n.classList.remove(c));
+            });
+            runtimeClasses.forEach(c => root.classList.remove(c));
+            root.querySelectorAll('.comment-badge, .edit-note-badge, .module-comment-btn, .target-flag').forEach(n => n.remove());
+        }
+
+        // 公共：调用 Deepseek 单次请求
+        async function callDeepseek(systemPrompt, userMessage) {
+            const k = await ensureKeys();
+            if (!k) throw new Error('未解锁，无法调用AI');
+            console.log('[AI] 开始调用 Deepseek...');
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 60000);
+            let res;
+            try {
+                res = await fetch(AI_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + k.aiKey,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: AI_MODEL,
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            { role: 'user', content: userMessage }
+                        ],
+                        stream: false,
+                        temperature: 0.3
+                    }),
+                    signal: controller.signal
+                });
+            } catch (e) {
+                if (e.name === 'AbortError') throw new Error('AI请求超时（>60s）');
+                throw new Error('网络错误：' + e.message);
+            } finally {
+                clearTimeout(timeoutId);
+            }
+            console.log('[AI] HTTP状态:', res.status);
+            if (!res.ok) {
+                const txt = await res.text().catch(() => '');
+                throw new Error('AI API失败 ' + res.status + ': ' + txt.substring(0, 200));
+            }
+            const data = await res.json();
+            let content = data.choices[0].message.content.trim();
+            content = content.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
+            try {
+                return JSON.parse(content);
+            } catch (e) {
+                throw new Error('AI返回非JSON：' + content.substring(0, 100));
+            }
+        }
+
+        async function callAIToModify(userPrompt, sectionId) {
+            const sectionEl = document.querySelector(`[data-section="${sectionId}"]`);
+            if (!sectionEl) throw new Error('找不到模块');
+            const cloned = sectionEl.cloneNode(true);
+            stripRuntimeForAI(cloned);
+            let html = cloned.outerHTML;
+            if (html.length > 6000) html = html.substring(0, 6000) + '...';
+
+            const systemPrompt = `你是HTML修改助手。用户给你一段HTML和修改诉求，返回严格的JSON（不要markdown代码块），格式：
+{
+  "action": "replace_text" | "replace_html" | "remove" | "insert_before" | "insert_after" | "set_attr",
+  "target_selector": "精确CSS选择器",
+  "new_text": "纯文本（action=replace_text）",
+  "new_html": "新HTML片段（action=replace_html / insert_before / insert_after）",
+  "attr_name": "属性名（action=set_attr）",
+  "attr_value": "属性值（action=set_attr，设为空字符串删除属性）",
+  "summary": "一句话中文说明（10-20字）"
+}
+
+规则：
+1. CSS选择器要稳定。**不要使用运行时class（has-comments / open / active / selected-target 等动态状态类）**，优先用语义类或属性选择器（如 [data-section] 、[data-target-id]）
+2. 选择器在传入的"当前模块HTML"范围内查找。如果要操作的是模块根节点本身，可以直接用根节点的标签或属性选择器（例如 div[data-section="settlement"]）
+3. 改样式（颜色/边框/背景）优先用 set_attr 改 style 或 class
+4. 用户说"删掉/去掉/不要XX" → 用 remove 删除目标。**绝不能删除整个 commentable 模块根节点**
+5. 不要返回JSON以外的内容
+6. summary 用中文，10-20字`;
+
+            const userMessage = `当前模块HTML：\n\`\`\`html\n${html}\n\`\`\`\n\n用户诉求：${userPrompt}\n\n请返回JSON。`;
+            return await callDeepseek(systemPrompt, userMessage);
+        }
+
+        // 单子元素 AI 修改
+        async function callAIToModifyTarget(userPrompt, targetEl) {
+            const cloned = targetEl.cloneNode(true);
+            stripRuntimeForAI(cloned);
+            let html = cloned.outerHTML;
+            if (html.length > 4000) html = html.substring(0, 4000) + '...';
+            const systemPrompt = `你是HTML修改助手。用户选中了一个具体子元素（例如一段文字/一张图/一个数据），返回严格的 JSON（不要 markdown）：
+{
+  "action": "replace_text" | "replace_html" | "remove" | "set_attr",
+  "target_selector": "[data-target-id=\\"...\\"]" 或更精确的 CSS 选择器,
+  "new_text": "...", "new_html": "...", "attr_name": "...", "attr_value": "...",
+  "summary": "一句话中文说明"
+}
+规则：
+- 优先 replace_text 或 set_attr，少用 replace_html
+- target_selector 必须能在传入的元素HTML里命中，**最稳的是用 [data-target-id="该元素的id"]**
+- 不要使用运行时类（has-comments/open/active/selected-target）
+- summary 中文 10-20 字`;
+            const userMessage = `当前元素HTML：\n\`\`\`html\n${html}\n\`\`\`\n\n用户诉求：${userPrompt}\n\n请返回JSON。`;
+            return await callDeepseek(systemPrompt, userMessage);
+        }
+
+        // 多元素批量 AI 修改：返回 [{target_id, action, ...}, ...]
+        async function callAIToModifyMulti(userPrompt, items) {
+            // 限制最多 6 个（toast 已在选中时提前提示）
+            const lim = items.slice(0, 6);
+            const blocks = lim.map((t, idx) => {
+                const el = document.querySelector(`[data-target-id="${t.targetId}"]`);
+                if (!el) return null;
+                const cloned = el.cloneNode(true);
+                stripRuntimeForAI(cloned);
+                let html = cloned.outerHTML;
+                if (html.length > 1500) html = html.substring(0, 1500) + '...';
+                return `### 元素 ${idx+1}（target_id="${t.targetId}"，类型=${el.classList.contains('commentable-image') ? 'image' : el.classList.contains('commentable-data') ? 'data' : 'text'}）\n\`\`\`html\n${html}\n\`\`\``;
+            }).filter(Boolean).join('\n\n');
+
+            const systemPrompt = `你是HTML批量修改助手。用户对多个元素同时提一个诉求，你需要为每个元素返回一个修改方案。返回严格的 JSON 数组（不要 markdown）：
+[
+  {
+    "target_id": "元素的data-target-id",
+    "action": "replace_text" | "set_attr" | "remove" | "replace_html",
+    "target_selector": "[data-target-id=\\"...\\"]" 或更精确，
+    "new_text": "...", "new_html": "...", "attr_name": "...", "attr_value": "...",
+    "summary": "一句话说明对该元素做了什么"
+  },
+  ...
+]
+规则：
+- 数组长度等于传入元素个数（每个都要返回方案，即使只是 set_attr 改 style）
+- target_id 字段必须填，且严格等于上下文里的 data-target-id
+- target_selector 一般填 \`[data-target-id="..."]\` 即可
+- 不要使用运行时类
+- 不要返回数组以外的内容（直接以 [ 开头，以 ] 结尾）`;
+            const userMessage = `共 ${lim.length} 个元素：\n\n${blocks}\n\n用户诉求：${userPrompt}\n\n请返回 JSON 数组。`;
+            const result = await callDeepseek(systemPrompt, userMessage);
+            if (!Array.isArray(result)) throw new Error('AI 多选返回非数组');
+            return result;
+        }
+
+        // 批量应用 AI 多选结果
+        function applyAIResultMulti(results) {
+            let summaries = [];
+            let errors = [];
+            let appliedCount = 0;
+            results.forEach(r => {
+                try {
+                    const tid = r.target_id;
+                    if (!tid) throw new Error('缺少 target_id');
+                    const el = document.querySelector(`[data-target-id="${tid}"]`);
+                    if (!el) throw new Error(`找不到 target_id=${tid}`);
+                    applyAIResult(r, el);
+                    appliedCount++;
+                    if (r.summary) summaries.push(r.summary);
+                } catch(e) {
+                    errors.push(`[${r.target_id || '?'}] ${e.message}`);
+                }
+            });
+            // v2.11.17：只要有任意一个失败就抛错，让上层 addComment 标记为 ai_failed 并提示
+            if (errors.length > 0) {
+                const msg = `${appliedCount}/${results.length} 项已改，${errors.length} 项失败：\n${errors.join('\n')}`;
+                throw new Error(msg);
+            }
+            return {
+                summary: summaries.length > 0 ? summaries.join(' / ') : '已批量修改',
+                errors
+            };
+        }
+
+        async function loadVersions() {
+            // v2.12.0：经 Worker 公开读
+            try {
+                const content = await gistGetFileContent(VERSIONS_FILENAME);
+                if (!content) return [];
+                return JSON.parse(content);
+            } catch (e) {
+                console.warn('[loadVersions] 失败', e);
+                return [];
+            }
+        }
+
+        // 仅当最新版本不是同一个snapshot时才保存（避免重复存）
+        async function saveVersionIfNeeded(prompt, author, sectionId, beforeChange) {
+            const snapshot = document.querySelector('.container').outerHTML;
+            const versions = await loadVersions();
+            // 如果已存在同样的snapshot作为最近一版，跳过
+            if (versions.length > 0 && versions[versions.length - 1].snapshot === snapshot) return;
+            return saveVersion(prompt, author, sectionId);
+        }
+
+        async function saveVersion(prompt, author, sectionId) {
+            // v2.11.15：克隆后剥离运行时 class（selected-target / has-comments / open / active / has-edit-notes）
+            // 否则下次 restoreLatestSnapshot 会把脏 class 写回 DOM，新用户看到默认选中态
+            const containerClone = document.querySelector('.container').cloneNode(true);
+            stripRuntimeForAI(containerClone);
+            // v2.11.18：把 base64 图片 src 替换成占位符（保留 alt/data-* 等属性）
+            // 恢复时用当前 DOM 同序号 img 的 src 回填，避免 snapshot 体积爆炸（1MB Gist 限制）
+            const imgs = containerClone.querySelectorAll('img');
+            imgs.forEach((img, idx) => {
+                const src = img.getAttribute('src') || '';
+                if (src.startsWith('data:')) {
+                    img.setAttribute('data-img-idx', String(idx));
+                    img.setAttribute('src', `__IMG_PLACEHOLDER_${idx}__`);
+                }
+            });
+            const snapshot = containerClone.outerHTML;
+            const versions = await loadVersions();
+            const versionNum = versions.length + 1;
+            versions.push({
+                v: versionNum,
+                time: new Date().toLocaleString('zh-CN'),
+                author: author,
+                section: sectionId,
+                prompt: prompt,
+                snapshot: snapshot
+            });
+            const trimmed = versions.slice(-5);
+            try {
+                await gistWrite(VERSIONS_FILENAME, JSON.stringify(trimmed));
+            } catch (e) { console.warn('保存版本失败', e); }
+            return versionNum;
+        }
+
+        // v2.11.23：把当前 DOM（AI 改后）存为 latest，用于刷新恢复。
+        // 与 versions（撤回历史=改前 snapshot）分离，避免"刷新后被改前 snapshot 覆盖还原"。
+        async function saveLatestSnapshot() {
+            const containerClone = document.querySelector('.container').cloneNode(true);
+            stripRuntimeForAI(containerClone);
+            containerClone.querySelectorAll('img').forEach((img, idx) => {
+                const src = img.getAttribute('src') || '';
+                if (src.startsWith('data:')) {
+                    img.setAttribute('data-img-idx', String(idx));
+                    img.setAttribute('src', `__IMG_PLACEHOLDER_${idx}__`);
+                }
+            });
+            const snapshot = containerClone.outerHTML;
+            try {
+                await gistWrite(LATEST_FILENAME, JSON.stringify({ time: new Date().toLocaleString('zh-CN'), snapshot }));
+            } catch(e) { console.warn('保存 latest 失败', e); }
+        }
+
+        async function openVersions() {
+            const modal = document.getElementById('versionModal');
+            modal.style.display = 'flex';
+            const list = document.getElementById('versionList');
+            list.innerHTML = '<div style="text-align:center;color:#999;padding:20px;">加载中...</div>';
+            const versions = await loadVersions();
+            if (versions.length === 0) {
+                list.innerHTML = '<div style="text-align:center;color:#999;padding:20px;">暂无版本记录</div>';
+                return;
+            }
+            list.innerHTML = versions.slice().reverse().map(v => `
+                <div style="padding:12px;background:#f8f8f8;border-radius:8px;margin-bottom:8px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                        <span style="font-size:13px;font-weight:600;color:#333;">v${v.v}</span>
+                        <button onclick="restoreVersion(${v.v})" style="font-size:11px;padding:4px 10px;background:#667eea;color:white;border:none;border-radius:4px;cursor:pointer;">↩️ 撤回此操作</button>
+                    </div>
+                    <div style="font-size:10px;color:#999;margin-bottom:4px;">${v.author} · ${v.time}</div>
+                    <div style="font-size:12px;color:#333;">操作：${(v.prompt || '').replace(/</g,'&lt;')}</div>
+                </div>
+            `).join('');
+        }
+
+        function closeVersions() {
+            document.getElementById('versionModal').style.display = 'none';
+        }
+
+        // v2.11.18：从当前页面收集 img base64 src，按 idx 索引（用于恢复 snapshot 占位符）
+        function collectImageSrcs() {
+            const map = {};
+            document.querySelectorAll('.container img').forEach((img, idx) => {
+                const src = img.getAttribute('src') || '';
+                if (src.startsWith('data:')) map[idx] = src;
+            });
+            return map;
+        }
+        function restoreImagePlaceholders(rootEl, srcMap) {
+            // rootEl 是新插入的 container，里面 src 是 __IMG_PLACEHOLDER_N__
+            rootEl.querySelectorAll('img').forEach(img => {
+                const src = img.getAttribute('src') || '';
+                const m = src.match(/^__IMG_PLACEHOLDER_(\d+)__$/);
+                if (m) {
+                    const idx = parseInt(m[1], 10);
+                    if (srcMap[idx]) {
+                        img.setAttribute('src', srcMap[idx]);
+                        img.removeAttribute('data-img-idx');
+                    }
+                }
+            });
+        }
+
+        async function restoreVersion(v) {
+            if (!confirm(`确定撤回此操作？页面将恢复到该操作执行前的状态。`)) return;
+            const versions = await loadVersions();
+            const target = versions.find(x => x.v === v);
+            if (!target) return alert('版本不存在');
+            // 替换前先收集当前页面 img base64
+            const srcMap = collectImageSrcs();
+            const newContainer = document.createElement('div');
+            newContainer.innerHTML = target.snapshot;
+            const oldContainer = document.querySelector('.container');
+            // 把 snapshot 里的图片占位符还原成真实 base64
+            if (newContainer.firstElementChild) restoreImagePlaceholders(newContainer.firstElementChild, srcMap);
+            oldContainer.parentNode.replaceChild(newContainer.firstElementChild, oldContainer);
+            // 重新注入模块评论按钮 + 子粒度标记
+            assignTargetIds();
+            bindTargetClicks();
+            injectModuleCommentBtns();
+            closeVersions();
+            await renderBadges();
+            // v2.11.19：回滚=撤回语义，不再写新版本。
+            // 直接把云端 versions 截断到 <=v 那一条，让 restoreLatestSnapshot 下次刷新拉到目标版本
+            try {
+                const truncated = versions.filter(x => x.v <= v);
+                await gistWrite(VERSIONS_FILENAME, JSON.stringify(truncated));
+            } catch(e) { console.warn('截断版本失败', e); }
+            // 同时把"AI 已执行 v>v 的评论"标为撤回（type 改回 normal，去掉 version 字段），让 AI 修改 list 不再显示已撤销的记录
+            try {
+                const all = await loadAllComments();
+                let changed = false;
+                all.forEach(c => {
+                    if (c.type === 'ai_executed' && c.version && c.version > v) {
+                        c.type = 'ai_reverted';
+                        c.aiResponse = `已撤回（回到 v${v}）`;
+                        changed = true;
+                    }
+                });
+                if (changed) await saveAllComments(all);
+                await renderComments();
+            } catch(e) { console.warn('刷新评论失败', e); }
+            // v2.11.23：撤回后把当前 DOM（已恢复到 v 的状态）存 latest，刷新就是这个状态
+            await saveLatestSnapshot();
+            alert(`已撤回到 v${v}`);
+        }
+
+        async function deleteComment(i) {
+            const all = await loadAllComments();
+            if (all[i]) {
+                all.splice(i, 1);
+                await saveAllComments(all);
+                await renderComments();
+                await renderBadges();
+            }
+        }
+
+        async function exportComments() {
+            const comments = await loadFromCloud();
+            let out = '=== QB权益卡 x 元宝导流链路 - 评论汇总 ===\n';
+            out += '导出时间：' + new Date().toLocaleString('zh-CN') + '\n\n';
+            let has = false;
+            for (const [s, items] of Object.entries(comments)) {
+                if (items.length > 0) {
+                    has = true;
+                    out += `【${sectionNames[s] || s}】\n`;
+                    items.forEach(c => out += `  · ${c.author || '匿名'} · ${c.time}\n    ${c.text}\n`);
+                    out += '\n';
+                }
+            }
+            if (!has) { alert('暂无评论可导出'); return; }
+            const blob = new Blob([out], { type: 'text/plain;charset=utf-8' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `权益卡方案评论_${new Date().toISOString().slice(0,10)}.txt`;
+            a.click();
+        }
+
+        async function clearAllComments() {
+            if (confirm('确定清空所有评论？此操作会同步到云端')) {
+                await saveAllComments([]);
+                await renderBadges();
+                if (currentSection) await renderComments();
+            }
+        }
+
+        // 给每个 .commentable 注入"评论"角标按钮（hover 模块时才显示，点击才打开评论面板）
+        // 模块本身不再绑 click，避免长按选中、划词等被打断
+        // v2.8: 模块右上角的「评论」按钮已废弃 —— 评论入口统一为右下角 💬 全览 + 子元素直接点击
+        // 函数保留以兼容 restoreVersion / restoreLatestSnapshot 的调用，但现在只做清理
+        function injectModuleCommentBtns() {
+            // 移除所有已注入的模块按钮（如果有）
+            document.querySelectorAll('.module-comment-btn').forEach(el => el.remove());
+        }
+
+        // ========= 子粒度评论：自动标记 + 多选 =========
+        // 子粒度元素的"种子"选择器（按父section分组）。这些选择器内的元素将被标记为可独立评论。
+        // 设计：text=文案/标题/段落；image=图片；data=数字/标签/数据点
+        const TARGET_SELECTORS = {
+            text: [
+                // 大章节标题
+                '.sec-title', '.sec-sub', '.sec-num',
+                // 封面
+                '.cover h1', '.cover .cover-sub', '.cover .cover-label',
+                // 行业三卡
+                '.force-card .force-title', '.force-card .force-desc', '.force-card .force-tag', '.force-card .force-insight',
+                // 业务教训/共识卡
+                '.lesson-card .lesson-title', '.lesson-card .lesson-desc', '.lesson-card .lesson-quote', '.lesson-card .lesson-chip',
+                // 对比表
+                '.adv-table th', '.adv-table td',
+                // 一句话定位
+                '.statement .statement-text', '.statement .statement-label', '.statement .statement-foot',
+                // 环节详情
+                '.pillar-side .name', '.pillar-side .conclusion', '.pillar-side .q',
+                '.pillar-body h4', '.pillar-body ul li',
+                '.pillar-reason',
+                // 召唤/编辑/副本
+                '.summon-item .ttl', '.summon-dest',
+                '.layer-row .layer-name', '.layer-row .layer-desc', '.layer-row .layer-ai',
+                '.state-card .state-name', '.state-card .state-desc',
+                '.dest-item .ttl', '.dest-item .hint',
+                // 一期
+                '.phase-main .phase-title', '.phase-main .phase-reason', '.phase-main .phase-badge',
+                '.phase-pillar-tag', '.phase-pillar-desc',
+                '.phase-alt h4', '.alt-item .n', '.alt-item .d',
+                // 资源 / 自检
+                '.res-table th', '.res-table td',
+                '.check-card .check-q', '.check-card .check-a',
+                // footer
+                'footer'
+            ],
+            image: [
+                '.force-vis svg', '.pillars-hero svg', '.flywheel svg', '.scene-funnel svg'
+            ],
+            data: [
+                '.crown', '.dest-item .ic', '.summon-item .ic', '.layer-tag',
+                '.force-tag', '.phase-pillar-tag', '.res-icon',
+                '.adv-table .qb-col'
+            ]
+        };
+
+        // 为每个匹配的子元素分配稳定 data-target-id
+        function assignTargetIds() {
+            const counter = {}; // { 'qb-exposure-text': 0, ... }
+            for (const [type, selectors] of Object.entries(TARGET_SELECTORS)) {
+                selectors.forEach(sel => {
+                    document.querySelectorAll(sel).forEach(el => {
+                        if (el.dataset.targetId) return; // 防重
+                        const sectionEl = el.closest('.commentable[data-section]');
+                        const section = sectionEl ? sectionEl.dataset.section : '_root';
+                        const key = `${section}-${type}`;
+                        counter[key] = (counter[key] || 0) + 1;
+                        const tid = `${key}-${counter[key]}`;
+                        el.dataset.targetId = tid;
+                        el.classList.add('commentable-' + type);
+                    });
+                });
+            }
+        }
+
+        // 生成元素的简短描述（评论列表里展示用）
+        function getTargetLabel(el) {
+            if (!el) return '元素';
+            // 模块整体（点空白处兜底选中的）
+            if (el.classList.contains('commentable') && el.dataset.section && !el.classList.contains('commentable-text') && !el.classList.contains('commentable-image') && !el.classList.contains('commentable-data')) {
+                return '📦 ' + (sectionNames[el.dataset.section] || el.dataset.section);
+            }
+            if (el.classList.contains('commentable-image')) return '🖼️ 图片';
+            const txt = (el.textContent || '').trim().replace(/\s+/g, ' ');
+            const short = txt.length > 14 ? txt.slice(0, 14) + '…' : txt;
+            const prefix = el.classList.contains('commentable-data') ? '🔢 ' : '📝 ';
+            return prefix + (short || '元素');
+        }
+
+        // ========= 多选状态管理 =========
+        let selectedTargets = []; // [{ targetId, section, label, selector }]
+
+        function isInSelectionMode() { return selectedTargets.length > 0; }
+
+        function getStableSelector(el) {
+            // data-target-id 是我们自己生成的稳定锚点，优先用它
+            return `[data-target-id="${el.dataset.targetId}"]`;
+        }
+
+        function toggleTargetSelection(el) {
+            const tid = el.dataset.targetId;
+            const idx = selectedTargets.findIndex(t => t.targetId === tid);
+            if (idx >= 0) {
+                selectedTargets.splice(idx, 1);
+                el.classList.remove('selected-target');
+            } else {
+                const sectionEl = el.closest('.commentable[data-section]');
+                selectedTargets.push({
+                    targetId: tid,
+                    section: sectionEl ? sectionEl.dataset.section : null,
+                    label: getTargetLabel(el),
+                    selector: getStableSelector(el)
+                });
+                el.classList.add('selected-target');
+            }
+            // 选中后自动打开/刷新评论面板
+            syncSelectionToPanel();
+        }
+
+        // selectedTargets 变化时（v2.11）：
+        // - 选区为空 → 隐藏小气泡和输入框
+        // - 选区非空 → 显示小气泡（评论/AI 修改按钮），定位到最后选中的元素旁边
+        function syncSelectionToPanel() {
+            if (selectedTargets.length === 0) {
+                document.body.classList.remove('selection-mode');
+                hideBubbleToolbar();
+                hideBubbleInput();
+                return;
+            }
+            document.body.classList.add('selection-mode');
+            // v2.11.21：选中超 6 个时立即 toast 提示（不等到发送）
+            if (selectedTargets.length === 7) {
+                showTopToast('Demo 版 AI 修改上限 6 个元素，超出部分不会被处理。进阶诉求请用「💬 评论」留言', 5000);
+            }
+            // 显示小工具栏，定位到最后选中元素旁
+            const last = selectedTargets[selectedTargets.length - 1];
+            const el = document.querySelector(last.selector);
+            if (el) showBubbleToolbar(el);
+        }
+
+        // 兼容旧接口：updateMultiSelectBar / openMultiSelectPanel 仍可被调用，但不再做事
+        function updateMultiSelectBar() { /* deprecated: 工具栏已废弃 */ }
+        function openMultiSelectPanel(initialTab) {
+            if (selectedTargets.length === 0) return;
+            openPanel({ kind: 'multi', items: selectedTargets.slice() }, initialTab);
+        }
+
+        function exitSelectionMode() {
+            document.querySelectorAll('.selected-target').forEach(el => el.classList.remove('selected-target'));
+            selectedTargets = [];
+            syncSelectionToPanel();
+        }
+
+        // 子元素点击：v2.8.4 全部统一到 document 级别 capture，避免多层冲突
+        function bindTargetClicks() {
+            // 已废弃：每个元素单独绑定。现在统一在 document 级别处理。
+        }
+
+        // 工具：判断当前是否手机视图
+        function isMobileView() { return document.body.classList.contains('mobile-view'); }
+
+        // ========= 统一的 click 入口（document 级 capture） v2.11 =========
+        // 行为分支：
+        // PC:
+        //   - ⌘/Ctrl + click 任意可评论元素 → 加入/移出选区，弹小气泡
+        //   - 多选态下 普通click 任意可评论元素 → 加入/移出选区
+        //   - 展示评论态 + 单击有评论的元素 → 选中（弹小气泡）
+        //   - 点空白 + 选区非空 → 清空选区
+        // 手机:
+        //   - 隐藏评论态 → 单击什么都不做
+        //   - 展示评论态 → 单击元素=选中（圆点+小气泡），点空白取消
+        document.addEventListener('click', (e) => {
+            // v2.12.1：模态弹窗（密码框、昵称框）优先 return，绝不走选区逻辑
+            if (e.target.closest('#pwdDialog, #inputDialog')) return;
+            // v2.11：浮动小气泡和输入框点击优先 return，绝不走选区逻辑
+            if (e.target.closest('#bubbleToolbar, #bubbleInput, #topToast, #mobileCommentCard')) return;
+            const showComments = document.body.classList.contains('show-comments');
+            const isCmd = e.metaKey || e.ctrlKey;
+            const inSel = isInSelectionMode();
+            const mobile = isMobileView();
+            // UI 控件不处理
+            if (e.target.closest('#commentPanel, #globalCommentFab, #versionModal, #toggleCommentVisBtn, #helpBtn, #helpModal, .view-switcher, #marqueeBox')) return;
+
+            // 找选中目标（仅可评论子元素或带 data-section 的模块）
+            const findTarget = () => {
+                let t = e.target.closest('.commentable-text, .commentable-image, .commentable-data');
+                if (!t) {
+                    const moduleEl = e.target.closest('.commentable[data-section]');
+                    if (moduleEl) {
+                        if (!moduleEl.dataset.targetId) moduleEl.dataset.targetId = 'mod-' + moduleEl.dataset.section;
+                        t = moduleEl;
+                    }
+                }
+                return t;
+            };
+
+            // ====== 手机：批注态下，单击元素 → 直接弹评论卡片（不走选区）======
+            if (mobile) {
+                const target = findTarget();
+                if (!showComments) {
+                    // 只读态：不阻止任何点击行为（避免误伤 stage-tab / task-btn 等业务交互）
+                    // 只在点到 commentable 元素时异步提示一次切换批注（仅每设备首次）
+                    if (target && !localStorage.getItem(ANNOTATE_HINT_KEY)) {
+                        setTimeout(maybeShowAnnotateHint, 0);
+                    }
+                    return;
+                }
+                if (target) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openMobileCommentCard(target);
+                    return;
+                }
+                // 点空白：如果卡片打开就关掉
+                hideMobileCommentCard();
+                return;
+            }
+
+            // ====== PC：选中逻辑（v2.11.27 修正）======
+            //   - 批注态普通单击 commentable → 选中 → 弹出工具栏
+            //   - Cmd/Ctrl + 单击 → 多选
+            //   - 多选态下点空白 → 退出
+            if (isCmd || inSel || showComments) {
+                const target = findTarget();
+                if (!target) {
+                    // 批注态/多选态点空白 → 退出选中态
+                    if ((inSel || showComments) && !isCmd) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        exitSelectionMode();
+                    }
+                    return;
+                }
+                e.preventDefault();
+                e.stopPropagation();
+                if (!target.dataset.targetId && target.dataset.section) {
+                    target.dataset.targetId = 'mod-' + target.dataset.section;
+                }
+                toggleTargetSelection(target);
+                return;
+            }
+
+            // ====== PC：批注态下的面板保留逻辑（点已有评论徽标时关闭面板）======
+            if (showComments) {
+                // 兜底：面板开着且点空白 → 关闭
+                const panel = document.getElementById('commentPanel');
+                if (panel && panel.classList.contains('open')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    closePanel();
+                    return;
+                }
+            }
+
+            // 兜底：批注态 + 隐藏态都管 —— 面板开着且点空白 → 关闭
+            // （以防上面分支因为 showComments 切换错过）
+            const panelEl = document.getElementById('commentPanel');
+            if (panelEl && panelEl.classList.contains('open') && !e.target.closest('#commentPanel, #globalCommentFab, #versionModal, #helpModal, #bubbleToolbar, #bubbleInput, #topToast, #mobileCommentCard')) {
+                closePanel();
+            }
+        }, true);
+
+        function openMultiSelectPanel(initialTab) {
+            if (selectedTargets.length === 0) return;
+            // 用一份不可变快照传给面板
+            openPanel({ kind: 'multi', items: selectedTargets.slice() }, initialTab);
+        }
+
+        // ESC 退出多选
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && isInSelectionMode()) {
+                exitSelectionMode();
+            }
+        });
+
+        // ========= 框选（⌘/Ctrl + 鼠标拖拽 选中区域内的 commentable-* 元素） =========
+        let marquee = { active: false, startX: 0, startY: 0 };
+        document.addEventListener('mousedown', (e) => {
+            // 仅左键 + 按住 ⌘/Ctrl 时启动框选
+            if (e.button !== 0 || !(e.metaKey || e.ctrlKey)) return;
+            // 在工具栏 / 评论面板 / FAB 等 UI 控件上不触发
+            if (e.target.closest('#multiSelectBar, #commentPanel, #globalCommentFab, #versionModal, #toggleCommentVisBtn, #helpBtn, #helpModal')) return;
+            // 在已经标记的 commentable-* 元素上点击 → 走单击逻辑（toggleTargetSelection），不框选
+            if (e.target.closest('.commentable-text, .commentable-image, .commentable-data')) return;
+
+            marquee.active = true;
+            marquee.startX = e.pageX;
+            marquee.startY = e.pageY;
+            const box = document.getElementById('marqueeBox');
+            box.style.display = 'block';
+            box.style.left = e.pageX + 'px';
+            box.style.top = e.pageY + 'px';
+            box.style.width = '0px';
+            box.style.height = '0px';
+            document.body.classList.add('marquee-dragging');
+            e.preventDefault(); // 阻止默认的文本选中
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!marquee.active) return;
+            const x = Math.min(e.pageX, marquee.startX);
+            const y = Math.min(e.pageY, marquee.startY);
+            const w = Math.abs(e.pageX - marquee.startX);
+            const h = Math.abs(e.pageY - marquee.startY);
+            const box = document.getElementById('marqueeBox');
+            box.style.left = x + 'px';
+            box.style.top = y + 'px';
+            box.style.width = w + 'px';
+            box.style.height = h + 'px';
+        });
+
+        document.addEventListener('mouseup', (e) => {
+            if (!marquee.active) return;
+            marquee.active = false;
+            document.body.classList.remove('marquee-dragging');
+            const box = document.getElementById('marqueeBox');
+            const boxRect = {
+                left: parseFloat(box.style.left),
+                top: parseFloat(box.style.top),
+                right: parseFloat(box.style.left) + parseFloat(box.style.width),
+                bottom: parseFloat(box.style.top) + parseFloat(box.style.height)
+            };
+            box.style.display = 'none';
+
+            // 太小的拖动当点击处理（不框选）
+            const minSize = 6;
+            if (parseFloat(box.style.width) < minSize && parseFloat(box.style.height) < minSize) return;
+
+            // 找到 boxRect 范围内的所有 commentable-* 元素，加入选区
+            let lastEl = null;
+            document.querySelectorAll('.commentable-text, .commentable-image, .commentable-data').forEach(el => {
+                const r = el.getBoundingClientRect();
+                const elRect = {
+                    left: r.left + window.scrollX,
+                    top: r.top + window.scrollY,
+                    right: r.right + window.scrollX,
+                    bottom: r.bottom + window.scrollY
+                };
+                // 相交即选中
+                const overlap = !(elRect.right < boxRect.left || elRect.left > boxRect.right
+                    || elRect.bottom < boxRect.top || elRect.top > boxRect.bottom);
+                if (overlap) {
+                    const tid = el.dataset.targetId;
+                    if (!selectedTargets.find(t => t.targetId === tid)) {
+                        const sectionEl = el.closest('.commentable[data-section]');
+                        selectedTargets.push({
+                            targetId: tid,
+                            section: sectionEl ? sectionEl.dataset.section : null,
+                            label: getTargetLabel(el),
+                            selector: getStableSelector(el)
+                        });
+                        el.classList.add('selected-target');
+                        lastEl = el;
+                    }
+                }
+            });
+            // 框选完成后同步到面板
+            syncSelectionToPanel();
+        });
+
+        // ========= 点空白处退出多选 =========
+        document.addEventListener('click', (e) => {
+            if (!isInSelectionMode()) return;
+            // v2.12.1：模态弹窗（密码框、昵称框）优先 return
+            if (e.target.closest('#pwdDialog, #inputDialog')) return;
+            // 点 评论面板 / FAB / 版本modal / 顶部按钮 / commentable 元素 / v2.11 浮层 都不算空白
+            if (e.target.closest('#commentPanel, #globalCommentFab, #versionModal, #toggleCommentVisBtn, #helpBtn, #helpModal, #bubbleToolbar, #bubbleInput, #topToast, #mobileCommentCard')) return;
+            if (e.target.closest('.commentable-text, .commentable-image, .commentable-data')) return;
+            // ⌘/Ctrl 点击空白：可能是想框选误触，不退出
+            if (e.metaKey || e.ctrlKey) return;
+            exitSelectionMode();
+        });
+
+        // 启动时执行
+        assignTargetIds();
+        bindTargetClicks();
+        injectModuleCommentBtns();
+
+        // v2.11.15：启动时强制清除任何残留的选中态/临时高亮（防止 has-comments 持久 outline 等问题）
+        (function clearAnyResidualSelection() {
+            document.querySelectorAll('.selected-target').forEach(el => el.classList.remove('selected-target'));
+            // 清除所有元素 inline outline（如果有的话）
+            document.querySelectorAll('[style*="outline"]').forEach(el => {
+                el.style.outline = '';
+            });
+            selectedTargets = [];
+            document.body.classList.remove('selection-mode');
+        })();
+
+        // 输入框不监听回车，避免误触（兼容中英文输入法换行/确认）
+        // 用户需点击按钮提交
+        // 页面加载时只静默检查（不弹密码框），用户点击模块再触发解锁
+        renderBadges();
+
+        // v2.11.26：评论实时同步——双保险机制
+        // 1) 30 秒轮询：拉云端最新评论，与本地比对，有新增就重渲染徽标
+        // 2) 提交后 5 秒回拉确认：addComment 末尾会 setTimeout 5s 后再拉一次（在 addComment 修改）
+        // 3) 页面切换可见性时立即拉一次（避免长时间挂起后看到旧数据）
+        let _lastCommentSig = '';
+        async function pollComments(reason) {
+            try {
+                const data = await loadFromCloud();
+                const all = (data && data.all) || [];
+                // 用 length + 最后一条 id/time 当签名，比对就行
+                const last = all.length ? all[all.length - 1] : null;
+                const sig = all.length + ':' + (last ? (last.id || last.time || '') : '');
+                if (sig !== _lastCommentSig) {
+                    _lastCommentSig = sig;
+                    if (reason !== 'init') {
+                        console.log('[poll] 评论变化（' + reason + '），重新渲染', all.length, '条');
+                    }
+                    await renderBadges();
+                }
+            } catch (e) { console.warn('[poll] 失败', e); }
+        }
+        // 初始 sig
+        pollComments('init');
+        // 30 秒轮询
+        setInterval(() => pollComments('interval'), 30000);
+        // visibility 切回前台立即拉
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) pollComments('visible');
+        });
+
+        // 启动时从云端拉取 latest snapshot（AI 修改后的当前最新 DOM）
+        // v2.12.0：经 Worker 公开读
+        (async function restoreLatestSnapshot() {
+            try {
+                const content = await gistGetFileContent(LATEST_FILENAME);
+                if (!content) return;
+                const latest = JSON.parse(content);
+                if (!latest || !latest.snapshot) return;
+                const newContainer = document.createElement('div');
+                newContainer.innerHTML = latest.snapshot;
+                const oldContainer = document.querySelector('.container');
+                if (oldContainer && newContainer.firstElementChild) {
+                    stripRuntimeForAI(newContainer.firstElementChild);
+                    const srcMap = collectImageSrcs();
+                    restoreImagePlaceholders(newContainer.firstElementChild, srcMap);
+                    oldContainer.parentNode.replaceChild(newContainer.firstElementChild, oldContainer);
+                    assignTargetIds();
+                    bindTargetClicks();
+                    injectModuleCommentBtns();
+                    await renderBadges();
+                    console.log(`[restore] 已恢复到云端 latest（${latest.time}）`);
+                }
+            } catch(e) { console.warn('恢复 latest snapshot 失败', e); }
+        })();
+
+        // ========= 新手引导浮层 =========
+        const HELP_KEY = 'qb_report_helped_v2';
+
+        // 三个步骤的 SVG 动画（CSS animation 驱动）
+        const HELP_ANIMS = {
+            "pc-1": `<svg class="help-svg" viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg">
+                <defs><style>
+                    @keyframes c1 { 0%,20% { transform: translate(30px,160px); opacity:0; } 25% { opacity:1; } 60%,100% { transform: translate(140px,100px); opacity:1; } }
+                    @keyframes e1 { 0%,55% { stroke:#ddd; fill:white; } 65%,100% { stroke:#667eea; stroke-width:2.5; fill:rgba(102,126,234,0.10); } }
+                    .c1 { animation: c1 3s ease-out infinite; }
+                    .e1 { animation: e1 3s linear infinite; }
+                </style></defs>
+                <rect x="30" y="40" width="220" height="24" rx="4" fill="#f0f0f0"/>
+                <rect x="30" y="75" width="180" height="14" rx="3" fill="#f0f0f0"/>
+                <rect class="e1" x="30" y="96" width="220" height="46" rx="6" stroke="#ddd" fill="white" stroke-width="1.5"/>
+                <text x="140" y="124" text-anchor="middle" font-size="12" fill="#667eea" font-weight="600">待选中元素</text>
+                <g class="c1"><path d="M0 0 L0 16 L4 12 L7 19 L9 18 L6 11 L12 11 Z" fill="#333" stroke="white" stroke-width="1"/></g>
+                <text x="140" y="180" text-anchor="middle" font-size="11" fill="#333" font-weight="600">⌘/Ctrl + 单击选中</text>
+            </svg>`,
+            "pc-2": `<svg class="help-svg" viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg">
+                <defs><style>
+                    @keyframes b2 { 0%,30% { opacity:0; transform:translateY(6px); } 45%,100% { opacity:1; transform:translateY(0); } }
+                    @keyframes t2 { 0%,55% { opacity:0; } 70%,100% { opacity:1; } }
+                    .b2 { animation: b2 2.8s ease-out infinite; }
+                    .t2 { animation: t2 2.8s ease-out infinite; }
+                </style></defs>
+                <rect x="30" y="70" width="220" height="46" rx="6" stroke="#667eea" stroke-width="2.5" fill="rgba(102,126,234,0.10)"/>
+                <text x="140" y="98" text-anchor="middle" font-size="12" fill="#667eea" font-weight="600">已选中</text>
+                <g class="b2" transform="translate(60, 38)">
+                    <rect width="90" height="28" rx="14" fill="#1a1a1a"/>
+                    <text x="45" y="18" text-anchor="middle" fill="white" font-size="11" font-weight="600">💬 评论</text>
+                </g>
+                <g class="t2" transform="translate(30, 130)">
+                    <rect width="220" height="44" rx="8" fill="#f7f8fc" stroke="#e0e0e0"/>
+                    <text x="12" y="20" font-size="10" fill="#999">写评论…</text>
+                    <text x="12" y="36" font-size="11" fill="#333">这里数据要再核对一下</text>
+                </g>
+            </svg>`,
+            "pc-3": `<svg class="help-svg" viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg">
+                <rect x="20" y="30" width="240" height="140" rx="8" fill="white" stroke="#e0e0e0"/>
+                <text x="140" y="58" text-anchor="middle" font-size="13" fill="#1a1a1a" font-weight="700">feedback.md</text>
+                <line x1="40" y1="72" x2="240" y2="72" stroke="#f0f0f0"/>
+                <text x="40" y="94" font-size="10" fill="#666">- [overview] 整体概览 · 2 条</text>
+                <text x="40" y="114" font-size="10" fill="#666">- [chapter-1] 章节 1 · 5 条</text>
+                <text x="40" y="134" font-size="10" fill="#666">- [chapter-2] 章节 2 · 8 条</text>
+                <text x="140" y="178" text-anchor="middle" font-size="11" fill="#667eea" font-weight="600">📤 作者一键导出 Markdown</text>
+            </svg>`,
+            "mobile-1": `<svg class="help-svg" viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">
+                <defs><style>
+                    @keyframes bt { 0%,30% { fill:white; stroke:#e0e0e0; } 50%,100% { fill:#667eea; stroke:#667eea; } }
+                    @keyframes bx { 0%,30% { fill:#666; } 50%,100% { fill:white; } }
+                    .bt { animation: bt 2.4s ease-out infinite; }
+                    .bx { animation: bx 2.4s ease-out infinite; }
+                </style></defs>
+                <rect x="30" y="20" width="140" height="240" rx="22" fill="white" stroke="#333" stroke-width="3"/>
+                <rect class="bt" x="112" y="38" width="50" height="28" rx="6" fill="white" stroke="#e0e0e0" stroke-width="1.5"/>
+                <text class="bx" x="137" y="56" text-anchor="middle" font-size="11" font-weight="600" fill="#666">批注</text>
+                <rect x="45" y="85" width="110" height="10" rx="2" fill="#e0e0e0"/>
+                <rect x="45" y="105" width="90" height="10" rx="2" fill="#e0e0e0"/>
+                <text x="100" y="210" text-anchor="middle" font-size="11" fill="#333" font-weight="600">点【只读】→【批注】</text>
+                <text x="100" y="228" text-anchor="middle" font-size="10" fill="#667eea">切到批注模式</text>
+            </svg>`,
+            "mobile-2": `<svg class="help-svg" viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">
+                <defs><style>
+                    @keyframes tap { 0%,30% { r:0; opacity:0.5; } 60% { r:18; opacity:0; } 100% { r:18; opacity:0; } }
+                    @keyframes card { 0%,40% { transform: translateY(80px); opacity:0; } 55%,100% { transform: translateY(0); opacity:1; } }
+                    .tap { animation: tap 2.6s ease-out infinite; }
+                    .card { animation: card 2.6s ease-out infinite; }
+                </style></defs>
+                <rect x="30" y="15" width="140" height="260" rx="22" fill="white" stroke="#333" stroke-width="3"/>
+                <rect x="45" y="65" width="110" height="44" rx="6" stroke="#667eea" stroke-width="2" fill="rgba(102,126,234,0.10)"/>
+                <text x="100" y="92" text-anchor="middle" font-size="11" fill="#667eea" font-weight="600">元素</text>
+                <circle class="tap" cx="100" cy="87" r="0" fill="#667eea"/>
+                <g class="card" transform="translate(35, 155)">
+                    <rect width="130" height="90" rx="10" fill="#f7f8fc" stroke="#e0e0e0"/>
+                    <text x="12" y="22" font-size="10" fill="#999">写评论…</text>
+                    <text x="12" y="42" font-size="10" fill="#333">数据要核对</text>
+                    <rect x="12" y="58" width="106" height="22" rx="4" fill="#667eea"/>
+                    <text x="65" y="73" text-anchor="middle" font-size="10" fill="white" font-weight="600">💬 发表评论</text>
+                </g>
+            </svg>`,
+            "mobile-3": `<svg class="help-svg" viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">
+                <rect x="20" y="30" width="160" height="200" rx="8" fill="white" stroke="#e0e0e0"/>
+                <text x="100" y="58" text-anchor="middle" font-size="12" fill="#1a1a1a" font-weight="700">feedback.md</text>
+                <line x1="35" y1="72" x2="165" y2="72" stroke="#f0f0f0"/>
+                <text x="35" y="94" font-size="9" fill="#666">- overview · 2 条</text>
+                <text x="35" y="114" font-size="9" fill="#666">- chapter-1 · 5 条</text>
+                <text x="35" y="134" font-size="9" fill="#666">- chapter-2 · 8 条</text>
+                <text x="100" y="200" text-anchor="middle" font-size="10" fill="#667eea" font-weight="600">📤 作者一键导出</text>
+            </svg>`
+        };
+
+        // 步骤数据 + 按设备区分
+        const HELP_STEPS = {
+            pc: [
+                { num: 1, title: '⌘ 选中元素', desc: '⌘/Ctrl + 单击；空白处拖动可框选多个' },
+                { num: 2, title: '💬 写评论', desc: '选中后点气泡【💬 评论】输入看法发送' },
+                { num: 3, title: '📤 作者导出', desc: '作者一键导出所有反馈为 Markdown' }
+            ],
+            mobile: [
+                { num: 1, title: '切到【批注】', desc: '右上角【只读】按钮点一下切成【批注】' },
+                { num: 2, title: '点元素留言', desc: '点文字/数据 → 底部弹卡片 → 输入发送' },
+                { num: 3, title: '📤 作者导出', desc: '作者一键导出所有反馈为 Markdown' }
+            ]
+        };
+
+        let currentHelpDevice = 'pc';
+        let currentHelpStep = 1;
+
+        function renderHelpSteps() {
+            const wrap = document.getElementById('helpSteps');
+            if (!wrap) return;
+            const steps = HELP_STEPS[currentHelpDevice];
+            wrap.innerHTML = steps.map(s => {
+                const active = s.num === currentHelpStep;
+                return `<div class="help-step${active ? ' active' : ''}" data-step="${s.num}" onclick="switchHelpStep(${s.num})" style="padding:12px 14px;border:1.5px solid ${active ? '#667eea' : '#f0f0f0'};background:${active ? '#f0f4ff' : 'white'};border-radius:10px;cursor:pointer;transition:all 0.15s;">
+                    <div style="font-size:13px;font-weight:600;color:#333;display:flex;align-items:center;gap:6px;">
+                        <span style="background:${active ? '#667eea' : '#999'};color:white;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;">${s.num}</span>
+                        ${s.title}
+                    </div>
+                    <div style="font-size:12px;color:#666;line-height:1.6;margin-top:6px;">${s.desc}</div>
+                </div>`;
+            }).join('');
+        }
+
+        function switchHelpStep(n) {
+            currentHelpStep = n;
+            renderHelpSteps();
+            const anim = document.getElementById('helpAnim');
+            const animKey = currentHelpDevice + '-' + n;
+            if (anim) anim.innerHTML = HELP_ANIMS[animKey] || HELP_ANIMS[n] || '';
+        }
+
+        function switchHelpDevice(device) {
+            currentHelpDevice = device;
+            currentHelpStep = 1;
+            // device-tab 激活态
+            document.querySelectorAll('.device-tab').forEach(b => {
+                const act = b.dataset.device === device;
+                b.classList.toggle('active', act);
+                b.style.background = act ? '#f0f4ff' : 'transparent';
+                b.style.color = act ? '#667eea' : '#999';
+                b.style.borderBottomColor = act ? '#667eea' : 'transparent';
+            });
+            const animArea = document.getElementById('helpAnim');
+            const stepsArea = document.getElementById('helpSteps');
+            if (device === 'about') {
+                // "关于" Tab：全宽介绍页——介绍工具本身，不是方案内容
+                animArea.style.display = 'none';
+                stepsArea.style.width = '100%';
+                stepsArea.innerHTML = `
+                    <div style="padding:8px 6px;line-height:1.7;">
+                        <h2 style="font-size:18px;margin:0 0 4px;color:#1f2937;">HTML 汇报助手</h2>
+                        <p style="font-size:11px;color:#999;margin:0 0 14px;">基于 GitHub 云端 · 在线评论版</p>
+
+                        <h3 style="font-size:13px;margin:0 0 6px;color:#1f2937;">🧩 是什么</h3>
+                        <p style="font-size:12px;color:#555;margin:0 0 12px;">
+                            把 Word / PPT / Markdown 方案转成 HTML，加上在线评论 + 多视图能力，一键部署到云端。生成一条链接发给老板/同事，打开就能看、能评。
+                        </p>
+
+                        <h3 style="font-size:13px;margin:0 0 6px;color:#1f2937;">❗ 解决什么问题</h3>
+                        <p style="font-size:12px;color:#555;margin:0 0 12px;">
+                            以前看方案 → 截图批注 → 拉群讨论 → 回去改稿 → 再发 → 反复几轮。<br>
+                            现在打开链接直接在页面上评论，所有人看到的都是同一份最新版，反馈零成本、迭代秒级。
+                        </p>
+
+                        <h3 style="font-size:13px;margin:0 0 6px;color:#1f2937;">⚡ 核心能力</h3>
+                        <ul style="font-size:12px;color:#555;padding-left:18px;margin:0 0 12px;line-height:1.8;">
+                            <li><b>颗粒度评论</b> — 点任意文字/图片/数据直接评；PC 支持 ⌘+click 多选 / 拖动框选跨元素批量评</li>
+                            <li><b>评论可筛选 · 可导出</b> — 方案 owner 一键导出全部反馈为 Markdown，丢给 WorkBuddy 批量返工</li>
+                            <li><b>PC / 手机双视图</b> — 同链接自适应，能力一致（手机唯一区别：不支持拖动框选）</li>
+                            <li><b>零安装</b> — 浏览器打开链接就能用，不装 App、不登录</li>
+                        </ul>
+
+                        <h3 style="font-size:13px;margin:0 0 8px;color:#1f2937;">🚀 怎么用</h3>
+                        <p style="font-size:12px;color:#555;margin:0 0 10px;">按当前设备查看操作指南：</p>
+                        <div style="display:flex;gap:12px;">
+                            <button onclick="switchHelpDevice('pc')" style="flex:1;padding:12px;background:#f0f4ff;border:1.5px solid #667eea;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;color:#667eea;">💻 PC 端指南 →</button>
+                            <button onclick="switchHelpDevice('mobile')" style="flex:1;padding:12px;background:#f0fdf4;border:1.5px solid #10b981;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;color:#10b981;">📱 手机端指南 →</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // PC / 手机端：恢复左右拆分（手机视图 或 窄屏 都强制上下布局）
+                animArea.style.display = 'flex';
+                const bodyEl = stepsArea.parentElement;
+                const useMobileLayout = isMobileView() || window.innerWidth < 760;
+                if (useMobileLayout) {
+                    // 手机：上动画 + 下步骤，纵向
+                    bodyEl.style.flexDirection = 'column';
+                    animArea.style.width = '100%';
+                    animArea.style.minHeight = '180px';
+                    animArea.style.maxHeight = '34vh';
+                    animArea.style.padding = '12px';
+                    animArea.style.borderRight = 'none';
+                    animArea.style.borderBottom = '1px solid #f0f0f0';
+                    stepsArea.style.width = '100%';
+                    stepsArea.style.flex = '1';
+                } else {
+                    bodyEl.style.flexDirection = 'row';
+                    animArea.style.width = '55%';
+                    animArea.style.minHeight = '340px';
+                    animArea.style.maxHeight = '';
+                    animArea.style.padding = '20px';
+                    animArea.style.borderRight = '1px solid #f0f0f0';
+                    animArea.style.borderBottom = 'none';
+                    stepsArea.style.width = '45%';
+                    stepsArea.style.flex = '';
+                }
+                renderHelpSteps();
+                switchHelpStep(1);
+            }
+        }
+
+        function openHelp() {
+            document.getElementById('helpModal').style.display = 'flex';
+            // 默认进"关于" Tab
+            switchHelpDevice('about');
+        }
+        function closeHelp() {
+            document.getElementById('helpModal').style.display = 'none';
+            localStorage.setItem(HELP_KEY, '1');
+        }
+
+        // 手机抽屉：点 panel-header 区域切换 expanded（半屏 ↔ 接近全屏）
+        document.addEventListener('click', (e) => {
+            if (!isMobileView()) return;
+            const panel = document.getElementById('commentPanel');
+            if (!panel || !panel.classList.contains('open')) return;
+            const header = e.target.closest('.panel-header');
+            if (!header) return;
+            if (e.target.closest('.panel-close, .panel-tab, button')) return;
+            document.body.classList.toggle('panel-expanded');
+        });
+
+        // 首次访问自动弹（每个用户只弹一次）
+        (function maybeShowHelp() {
+            if (!localStorage.getItem(HELP_KEY)) {
+                setTimeout(openHelp, 500);
+            }
+        })();
+
+        // 评论可见性切换（按钮文字=当前状态：白底"只读"=只读中；蓝底"批注"=批注中）
+        function toggleCommentVisibility() {
+            const on = !document.body.classList.contains('show-comments');
+            document.body.classList.toggle('show-comments', on);
+            localStorage.setItem('show_comments', on ? '1' : '0');
+            const btn = document.getElementById('toggleCommentVisBtn');
+            if (btn) {
+                btn.textContent = on ? '批注' : '只读';
+                btn.style.background = on ? '#667eea' : 'white';
+                btn.style.color = on ? 'white' : '#666';
+                btn.style.borderColor = on ? '#667eea' : '#e0e0e0';
+            }
+        }
+        // 初始化
+        (function initCommentVis() {
+            const saved = localStorage.getItem('show_comments');
+            const on = saved === '1';  // 默认隐藏
+            document.body.classList.toggle('show-comments', on);
+            const btn = document.getElementById('toggleCommentVisBtn');
+            if (btn) {
+                btn.textContent = on ? '批注' : '只读';
+                btn.style.background = on ? '#667eea' : 'white';
+                btn.style.color = on ? 'white' : '#666';
+                btn.style.borderColor = on ? '#667eea' : '#e0e0e0';
+            }
+        })();
+
+        // ========= 一键导出全部评论（云端Gist里的所有评论 → Markdown） =========
+        async function exportAllComments() {
+            const all = await loadAllComments();
+            if (all.length === 0) { alert('暂无评论可导出'); return; }
+
+            let out = '# HTML汇报 - 评论导出\n\n';
+            out += `导出时间：${new Date().toLocaleString('zh-CN')}\n`;
+            out += `在线地址：${location.href}\n`;
+            out += `共 ${all.length} 条评论\n\n---\n\n`;
+
+            const formatItem = (c, i) => {
+                let s = `${i+1}. **${c.author || '匿名'}** _(${c.time})_`;
+                if (c.type === 'ai_executed') s += ' · ⚡AI已执行';
+                if (c.type === 'ai_failed') s += ' · ❌AI失败';
+                if (c.type === 'ai_pending') s += ' · ⏳处理中';
+                s += `\n   范围：${getCommentScopeLabel(c)}\n`;
+                if (c.scope === 'multi' && c.targets && c.targets.length > 1) {
+                    s += '   涉及：' + c.targets.map(t => t.label || '元素').join(' / ') + '\n';
+                }
+                s += `   ${c.text}\n`;
+                if (c.aiResponse) s += `   > AI响应：${c.aiResponse}\n`;
+                s += '\n';
+                return s;
+            };
+
+            // 按 scope 分类
+            const groups = {
+                global: all.filter(c => c.scope === 'global'),
+                multi: all.filter(c => c.scope === 'multi'),
+                section: all.filter(c => c.scope === 'section'),
+                target: all.filter(c => c.scope === 'target')
+            };
+
+            if (groups.global.length > 0) {
+                out += `## 🌐 全局评论\n\n`;
+                groups.global.forEach((c, i) => out += formatItem(c, i));
+                out += `---\n\n`;
+            }
+            if (groups.multi.length > 0) {
+                out += `## 🔗 跨元素评论\n\n`;
+                groups.multi.forEach((c, i) => out += formatItem(c, i));
+                out += `---\n\n`;
+            }
+            if (groups.section.length > 0) {
+                out += `## 📦 模块评论\n\n`;
+                // 按 section 二次分组
+                const bySection = {};
+                groups.section.forEach(c => {
+                    if (!bySection[c.section]) bySection[c.section] = [];
+                    bySection[c.section].push(c);
+                });
+                for (const [sec, list] of Object.entries(bySection)) {
+                    out += `### 【${sectionNames[sec] || sec}】\n\n`;
+                    list.forEach((c, i) => out += formatItem(c, i));
+                }
+                out += `---\n\n`;
+            }
+            if (groups.target.length > 0) {
+                out += `## 🎯 子元素评论\n\n`;
+                const byTarget = {};
+                groups.target.forEach(c => {
+                    if (!byTarget[c.targetId]) byTarget[c.targetId] = [];
+                    byTarget[c.targetId].push(c);
+                });
+                for (const [tid, list] of Object.entries(byTarget)) {
+                    const el = document.querySelector(`[data-target-id="${tid}"]`);
+                    out += `### 【${el ? getTargetLabel(el) : tid}】\n\n`;
+                    list.forEach((c, i) => out += formatItem(c, i));
+                }
+            }
+
+            const blob = new Blob([out], { type: 'text/markdown;charset=utf-8' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `汇报评论_${new Date().toISOString().slice(0,10)}_${new Date().toTimeString().slice(0,5).replace(':','')}.md`;
+            a.click();
+        }
+
+        // 关闭面板时退出批量模式
+        const _origClosePanel = closePanel;
+        closePanel = function() {
+            _origClosePanel();
+            document.body.classList.remove('batch-mode');
+            const tb = document.getElementById('batchToolbar');
+            if (tb) tb.style.display = 'none';
+            const btb = document.getElementById('batchToggleBtn');
+            if (btb) {
+                btb.textContent = '批量';
+                btb.style.background = '#f0f0f0';
+                btb.style.color = '#666';
+            }
+        };
+
+        // ========= 评论批量操作 =========
+        function toggleBatchMode() {
+            const on = !document.body.classList.contains('batch-mode');
+            document.body.classList.toggle('batch-mode', on);
+            const toolbar = document.getElementById('batchToolbar');
+            toolbar.style.display = on ? 'flex' : 'none';
+            const btn = document.getElementById('batchToggleBtn');
+            btn.textContent = on ? '取消' : '批量';
+            btn.style.background = on ? '#667eea' : '#f0f0f0';
+            btn.style.color = on ? 'white' : '#666';
+            document.getElementById('batchSelectAll').checked = false;
+            renderComments();
+        }
+
+        function toggleSelectAll(checked) {
+            document.querySelectorAll('.batch-cb').forEach(cb => cb.checked = checked);
+            updateBatchCount();
+        }
+
+        function updateBatchCount() {
+            const checked = document.querySelectorAll('.batch-cb:checked').length;
+            const total = document.querySelectorAll('.batch-cb').length;
+            document.getElementById('batchCountLabel').textContent = `已选 ${checked}/${total} 项`;
+            const allCb = document.getElementById('batchSelectAll');
+            allCb.checked = checked > 0 && checked === total;
+            allCb.indeterminate = checked > 0 && checked < total;
+        }
+
+        function getSelectedIndices() {
+            return Array.from(document.querySelectorAll('.batch-cb:checked')).map(cb => parseInt(cb.dataset.idx));
+        }
+
+        async function batchExport() {
+            const indices = getSelectedIndices();
+            if (indices.length === 0) { alert('未选中任何评论'); return; }
+            const all = await loadAllComments();
+
+            let out = `# 评论导出\n\n`;
+            out += `导出时间：${new Date().toLocaleString('zh-CN')}\n`;
+            out += `共 ${indices.length} 条评论\n\n---\n\n`;
+            indices.forEach((i, n) => {
+                const c = all[i];
+                if (!c) return;
+                let typeLabel = '';
+                if (c.type === 'ai_executed') typeLabel = ` [AI已执行 v${c.version}]`;
+                else if (c.type === 'ai_failed') typeLabel = ` [AI失败]`;
+                else if (c.type === 'ai_pending') typeLabel = ` [处理中]`;
+                out += `## ${n+1}. ${c.author || '匿名'} · ${c.time}${typeLabel}\n\n`;
+                out += `范围：${getCommentScopeLabel(c)}\n\n`;
+                out += `${c.text}\n\n`;
+                if (c.aiResponse) out += `> AI回复：${c.aiResponse}\n\n`;
+                out += `---\n\n`;
+            });
+
+            const blob = new Blob([out], { type: 'text/markdown;charset=utf-8' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `评论_${new Date().toISOString().slice(0,10)}.md`;
+            a.click();
+        }
+
+        async function batchDelete() {
+            const indices = getSelectedIndices();
+            if (indices.length === 0) { alert('未选中任何评论'); return; }
+            if (!confirm(`确定删除选中的 ${indices.length} 条评论？此操作会同步到云端`)) return;
+            const all = await loadAllComments();
+            indices.sort((a,b) => b - a).forEach(i => all.splice(i, 1));
+            await saveAllComments(all);
+            await renderComments();
+            await renderBadges();
+        }
+    </script>
 </body>
 </html>
