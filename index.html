@@ -207,6 +207,129 @@
         body.mobile-view .export-btn { top: 56px; right: 10px; padding: 5px 10px; font-size: 10px; }
         body.mobile-view .clear-btn { top: 56px; right: 90px; padding: 5px 10px; font-size: 10px; }
 
+        /* ============================================================
+           ★ 手机视图：基于阅读性的精细重写（v2）
+           原则：1）容器全屏可读宽度，不再硬限 420px
+                2）多列 grid 全部降为单列或 2 列紧凑卡片
+                3）字号采用流体梯度（h1≥22 / sec-title≥20 / 正文 15）
+                4）section 横向 padding 收到 18px，纵向收到 36-44px
+                5）表格不缩字号，改为横向滚动
+                6）行高 1.7、字距正常，保证 4G 网络下也能舒服读
+           ============================================================ */
+        body.mobile-view { padding: 0 !important; }
+        body.mobile-view .container {
+            max-width: 100% !important;
+            padding: 0 !important;
+        }
+
+        /* —— section 通用 —— */
+        body.mobile-view section {
+            padding: 36px 18px !important;
+        }
+        body.mobile-view section.cover {
+            padding: 60px 22px !important;
+        }
+        body.mobile-view .sec-head { margin-bottom: 24px !important; }
+        body.mobile-view .sec-num { font-size: 11px !important; letter-spacing: 1.5px !important; }
+        body.mobile-view .sec-title {
+            font-size: 22px !important; line-height: 1.4 !important;
+            letter-spacing: -0.2px;
+        }
+        body.mobile-view .sec-lead {
+            font-size: 14.5px !important; line-height: 1.75 !important;
+        }
+
+        /* —— 封面 —— */
+        body.mobile-view .cover h1 {
+            font-size: 32px !important; line-height: 1.25 !important;
+            letter-spacing: -0.3px; margin-bottom: 14px !important;
+        }
+        body.mobile-view .cover-label {
+            font-size: 11px !important; letter-spacing: 3px !important; margin-bottom: 12px !important;
+        }
+        body.mobile-view .cover-sub {
+            font-size: 14.5px !important; line-height: 1.75 !important; max-width: 100% !important;
+        }
+        body.mobile-view .cover-meta {
+            margin-top: 28px !important;
+            flex-direction: column !important; gap: 8px !important;
+            font-size: 12.5px !important;
+        }
+        body.mobile-view .cover::before { width: 280px !important; height: 280px !important; right: -120px !important; top: -120px !important; }
+        body.mobile-view .cover::after { width: 220px !important; height: 220px !important; left: -100px !important; bottom: -120px !important; }
+
+        /* —— 一句话定位 —— */
+        body.mobile-view .statement {
+            padding: 36px 22px !important; border-radius: 14px !important;
+        }
+        body.mobile-view .statement-text {
+            font-size: 19px !important; line-height: 1.6 !important;
+        }
+        body.mobile-view .statement-label {
+            font-size: 11px !important; letter-spacing: 2.5px !important; margin-bottom: 12px !important;
+        }
+        body.mobile-view .statement::before { width: 200px !important; height: 200px !important; }
+        body.mobile-view .statement::after  { width: 170px !important; height: 170px !important; }
+
+        /* —— 多列 grid 全部降单列 —— */
+        body.mobile-view .sec-sub-list,
+        body.mobile-view .force-grid,
+        body.mobile-view .lesson-row,
+        body.mobile-view .pillar-detail,
+        body.mobile-view .phase-grid,
+        body.mobile-view .check-grid,
+        body.mobile-view .state-grid {
+            grid-template-columns: 1fr !important;
+            gap: 14px !important;
+        }
+        /* 4 项的 summon-grid 在手机上保留 2 列紧凑 */
+        body.mobile-view .summon-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 10px !important;
+        }
+        body.mobile-view .summon-item { padding: 10px 8px !important; font-size: 12.5px !important; }
+
+        /* —— 卡片内边距收敛（保留视觉但不再吃空间）—— */
+        body.mobile-view .force-card,
+        body.mobile-view .lesson-card,
+        body.mobile-view .phase-main,
+        body.mobile-view .check-card,
+        body.mobile-view .state-card { padding: 18px !important; border-radius: 10px !important; }
+        body.mobile-view .pillar-side { padding: 22px !important; border-radius: 12px !important; }
+        body.mobile-view .pillar-detail { margin-top: 20px !important; }
+
+        /* —— sec-sub-list 单条更可读 —— */
+        body.mobile-view .sec-sub-list .sli {
+            padding: 12px 14px !important; font-size: 13.5px !important; line-height: 1.7 !important;
+        }
+
+        /* —— 标题字号梯度（force/lesson/check 卡内）—— */
+        body.mobile-view .force-card h3,
+        body.mobile-view .lesson-card h3,
+        body.mobile-view .check-card h3,
+        body.mobile-view .phase-main h3 { font-size: 16px !important; }
+
+        /* —— 表格：禁止缩字号，改为横向滚动 —— */
+        body.mobile-view .detail-table { font-size: 13px !important; min-width: 540px; }
+        body.mobile-view .detail-table th,
+        body.mobile-view .detail-table td { padding: 8px 10px !important; font-size: 13px !important; }
+        /* 给所有表格自动包一个滚动容器（fallback：让 table 父级可滚）*/
+        body.mobile-view .detail-section { padding: 14px !important; border-radius: 10px !important; overflow-x: auto; }
+        body.mobile-view .detail-section h3 { font-size: 14px !important; }
+
+        /* —— 副标题/正文统一行高 —— */
+        body.mobile-view p { line-height: 1.75; }
+        body.mobile-view h2 { font-size: 20px !important; line-height: 1.4 !important; }
+        body.mobile-view h3 { font-size: 16px !important; }
+
+        /* —— 顶部工具栏紧凑：给到顶部 56px 留白即可 —— */
+        body.mobile-view { padding-top: 52px !important; }
+
+        /* —— 阅读体验：图片自适应、避免溢出 —— */
+        body.mobile-view img,
+        body.mobile-view svg { max-width: 100%; height: auto; }
+
+
         /* ===== 手机视图：评论面板改成底部抽屉 ===== */
         body.mobile-view .comment-panel {
             top: auto !important;
@@ -1995,7 +2118,7 @@
         const WORKER_BASE = 'https://1406195631-ft345q04pn.ap-guangzhou.tencentscf.com';
 
         // 仅 AI 改稿密钥（deepseek API key）保留密码加密存储——deepseek key 暴露不会被自动 revoke
-        const ENCRYPTED_KEYS = 'Qls6Jp0CX4oDLsawfrDCbDpOlQsZml/k+KifNDrG3R0VTT12wUTtoiSHtH8MYVP8vrsaBSYZ7WSXEyabrpwvUY/efoCpjYksLvXvkak3USiQaFVwL0U=';
+        const ENCRYPTED_KEYS = '7Z8ezz7e3ql1LPJTg7UdyTKJS5ONbT/yipaRqSoY/0/m200ScdZu5iDrMcGoQA8znOkqCe2bPJUercZBFUQbA15aCUvr3XmXlaf++oXhSO3hgvUO3zE=';
 
         let _cachedKeys = null;
         async function ensureKeys() {
