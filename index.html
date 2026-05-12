@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <!-- mobile-readability-v5.9 build:20260512-231700 manual-refresh-btn -->
+    <!-- mobile-readability-v5.10 build:20260512-232400 cover-positioning -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
@@ -1361,10 +1361,10 @@
 <!-- ========== 封面 ========== -->
 <section class="cover commentable" data-section="cover">
   <div class="cover-label">QQ 浏览器 · 元宝助手二期 · 二次编辑</div>
-  <h1>浏览器 AI<br/>看改一体<span>工作台</span></h1>
+  <h1>把元宝生成的内容<br/>变成<span>用户能用上的产出</span></h1>
   <p class="cover-sub">
-    在 AI 时代，让浏览器成为任何格式内容的"展示-编辑-交付"统一工作台。<br/>
-    用户进来先看，需要改时再召唤编辑；AI 帮你改得更快更好，但产品骨架不绑定 AI——模型迭代，框架立得住。
+    元宝把 AI 内容生成出来，浏览器要让它<b style="color:#FFD666;">改得了、留得住、带得走</b>。<br/>
+    生成不是终点——用户看完想改的那一刻，才是浏览器接住元宝的位置。AI 越强，用户越需要这一步。
   </p>
 </section>
 
@@ -1714,12 +1714,12 @@
   <div class="statement">
     <div class="statement-label">PROJECT STATEMENT</div>
     <div class="statement-text">
-      让浏览器成为任何格式内容<br/>
-      <span class="k">"展示 → 编辑 → 交付"</span>的统一工作台<br/>
-      <span style="font-size: 22px; opacity: .9;">先看，需要时再改；AI 只是加速器</span>
+      给元宝生成的 AI 内容<br/>
+      接上 <span class="k">"看 → 改 → 用"</span> 的下半场<br/>
+      <span style="font-size: 22px; opacity: .9;">让"看完想改"那一刻，浏览器是离用户最近的那个</span>
     </div>
     <div class="statement-foot">
-      产品骨架不绑定 AI 模型——模型怎么迭代，这个工作台都立得住。
+      AI 越强，用户对"在原稿上微调"的诉求越强——不做这一步，AI 内容只是一次性消耗品。
     </div>
   </div>
 </section>
@@ -2276,7 +2276,7 @@
         const WORKER_BASE = 'https://1406195631-ft345q04pn.ap-guangzhou.tencentscf.com';
 
         // 仅 AI 改稿密钥（deepseek API key）保留密码加密存储——deepseek key 暴露不会被自动 revoke
-        const ENCRYPTED_KEYS = 'K/cDVzBPiL+oGrRuEmsExJG2lBEC3Mwvxx0jm9gOuJoblAEe+bcreXZ57d4JzK0Zu3qB6KH6GbtAjd866Csv/eMvmmKF/vrZp4lqY9Zs2MdX3M95mYw=';
+        const ENCRYPTED_KEYS = '+dYnVwzD0sD/QIZL/rZ3+s29E/pUTJOwM9sEV1ID9W42hGVtpEPxTDE7ZLpqZiqid2f9GQQxZ24ShbG9czAPDnyNdLvbMK9OwulnE7IKK83LOlDNK+I=';
 
         let _cachedKeys = null;
         async function ensureKeys() {
