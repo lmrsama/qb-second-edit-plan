@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1200" />
+<title>浏览器 AI · 看改一体工作台 | 二次编辑项目规划</title>
+<style>
+  :root {
+    --qb-blue: #0052D9;
+    --qb-blue-2: #165DFF;
+    --qb-blue-3: #4080FF;
+    --qb-blue-bg: #EAF2FF;
+    --qb-blue-soft: #F5F9FF;
+    --ink: #1D2129;
+    --ink-2: #4E5969;
+    --ink-3: #86909C;
+    --line: #E5E6EB;
+    --bg: #F7F8FA;
+    --white: #FFFFFF;
+    --accent-warn: #F53F3F;
+    --accent-ok: #00B42A;
+    --accent-amber: #FF7D00;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Segoe UI", Roboto, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page {
+    width: 1200px;
+    margin: 0 auto;
+    padding: 0;
+    background: var(--white);
+  }
+  /* ---------- 封面 ---------- */
+  .cover {
+    background: linear-gradient(135deg, #0052D9 0%, #1B5CFF 50%, #4A7EFF 100%);
+    color: #fff;
+    padding: 80px 80px 90px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute; right: -120px; top: -120px;
+    width: 500px; height: 500px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.18), transparent 70%);
+  }
+  .cover::after {
+    content: '';
+    position: absolute; left: -80px; bottom: -100px;
+    width: 380px; height: 380px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.12), transparent 70%);
+  }
+  .cover-label {
+    font-size: 14px; letter-spacing: 6px; opacity: .85; margin-bottom: 18px;
+  }
+  .cover h1 {
+    font-size: 56px; font-weight: 800; line-height: 1.2; letter-spacing: -1px;
+    margin-bottom: 20px;
+    position: relative; z-index: 2;
+  }
+  .cover h1 span { color: #FFD666; }
+  .cover-sub {
+    font-size: 20px; opacity: .92; max-width: 720px; line-height: 1.7;
+    position: relative; z-index: 2;
+  }
+  .cover-meta {
+    margin-top: 48px; display: flex; gap: 40px; font-size: 14px; opacity: .85;
+    position: relative; z-index: 2;
+  }
+  .cover-meta b { font-weight: 600; opacity: 1; }
+
+  /* ---------- 通用 section ---------- */
+  section {
+    padding: 64px 80px;
+    border-bottom: 1px solid var(--line);
+  }
+  section.soft { background: var(--qb-blue-soft); }
+  .sec-head { margin-bottom: 40px; }
+  .sec-num {
+    display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: 2px;
+    color: var(--qb-blue); background: var(--qb-blue-bg);
+    padding: 4px 10px; border-radius: 4px; margin-bottom: 14px;
+  }
+  .sec-title {
+    font-size: 32px; font-weight: 700; color: var(--ink); margin-bottom: 10px;
+    line-height: 1.3;
+  }
+  .sec-sub {
+    font-size: 15px; color: var(--ink-2); max-width: 820px; line-height: 1.8;
+  }
+  .sec-sub-list {
+    max-width: 920px; margin-top: 12px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+  }
+  .sec-sub-list .sli {
+    background: var(--qb-blue-soft); border-left: 3px solid var(--qb-blue);
+    padding: 10px 14px; font-size: 14px; color: var(--ink); line-height: 1.6;
+    border-radius: 0 8px 8px 0;
+  }
+  .sec-sub-list .sli b { color: var(--qb-blue); font-weight: 600; display: block; margin-bottom: 4px; font-size: 12.5px; letter-spacing: .5px; }
+  .sec-sub-conclusion {
+    max-width: 920px; margin-top: 14px; padding: 12px 16px;
+    background: linear-gradient(90deg, rgba(0,82,217,.08), rgba(0,82,217,0));
+    border-left: 4px solid var(--qb-blue);
+    font-size: 15px; color: var(--ink); font-weight: 600; line-height: 1.7;
+    border-radius: 0 8px 8px 0;
+  }
+
+  /* ---------- 行业三股力量 ---------- */
+  .force-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+  }
+  .force-card {
+    background: var(--white); border: 1px solid var(--line); border-radius: 12px;
+    padding: 24px; position: relative;
+    transition: .2s; overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .force-card::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+    background: var(--qb-blue);
+  }
+  .force-tag {
+    display: inline-block; font-size: 12px; font-weight: 600;
+    color: var(--qb-blue); background: var(--qb-blue-bg);
+    padding: 3px 10px; border-radius: 10px; margin-bottom: 10px;
+    align-self: flex-start;
+  }
+  .force-title { font-size: 17px; font-weight: 700; margin-bottom: 14px; line-height: 1.4; }
+  .force-vis {
+    background: var(--qb-blue-soft); border-radius: 10px; padding: 14px 12px;
+    margin-bottom: 14px;
+  }
+  .force-vis svg { display: block; width: 100%; height: auto; }
+  .force-desc { font-size: 13.5px; color: var(--ink-2); line-height: 1.7; }
+  .force-desc b { color: var(--ink); font-weight: 600; }
+  .force-list { list-style: none; font-size: 13px; color: var(--ink-2); }
+  .force-list li {
+    padding: 6px 0 6px 18px; position: relative;
+  }
+  .force-list li::before {
+    content: ''; position: absolute; left: 0; top: 15px; width: 6px; height: 6px;
+    background: var(--qb-blue-3); border-radius: 50%;
+  }
+  .force-insight {
+    margin-top: 14px; padding: 10px 14px;
+    background: var(--qb-blue-soft); border-left: 3px solid var(--qb-blue);
+    font-size: 13px; color: var(--ink); line-height: 1.7;
+  }
+
+  /* ---------- 业务教训 ---------- */
+  .lesson-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+  }
+  .lesson-card {
+    background: var(--white); border: 1px solid var(--line); border-radius: 12px;
+    padding: 28px;
+  }
+  .lesson-card.warn { border-top: 4px solid var(--accent-warn); }
+  .lesson-card.ok   { border-top: 4px solid var(--qb-blue); }
+  .lesson-head {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+  }
+  .lesson-chip {
+    font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 10px;
+    background: #FFECE8; color: var(--accent-warn); letter-spacing: 1px;
+  }
+  .lesson-chip.ok { background: var(--qb-blue-bg); color: var(--qb-blue); }
+  .lesson-title { font-size: 20px; font-weight: 700; }
+  .lesson-desc { font-size: 14px; color: var(--ink-2); line-height: 1.8; margin-bottom: 14px; }
+  .lesson-quote {
+    font-size: 15px; font-weight: 600; color: var(--ink);
+    padding: 14px 16px; background: var(--bg); border-radius: 8px;
+    line-height: 1.7;
+  }
+  .lesson-quote em { font-style: normal; color: var(--accent-warn); }
+  .lesson-quote.ok em { color: var(--qb-blue); }
+
+  /* 5 大场景收口图 */
+  .scene-funnel {
+    margin-top: 36px; background: var(--white);
+    border: 1px solid var(--line); border-radius: 12px; padding: 28px;
+  }
+  .scene-funnel-title { font-size: 16px; font-weight: 700; margin-bottom: 18px; }
+
+  /* ---------- 四件套优势对比 ---------- */
+  .adv-table {
+    width: 100%; border-collapse: separate; border-spacing: 0;
+    background: var(--white); border: 1px solid var(--line); border-radius: 12px;
+    overflow: hidden; font-size: 14px;
+  }
+  .adv-table th, .adv-table td {
+    padding: 18px 20px; text-align: left; border-bottom: 1px solid var(--line);
+    vertical-align: middle;
+  }
+  .adv-table thead th {
+    background: var(--qb-blue); color: #fff; font-weight: 600; font-size: 13px;
+    letter-spacing: 1px;
+  }
+  .adv-table thead th.hl { background: var(--qb-blue-2); }
+  .adv-table tbody tr:last-child td { border-bottom: none; }
+  .adv-table tbody tr:nth-child(even) { background: var(--qb-blue-soft); }
+  .adv-table .dim-name { font-weight: 600; color: var(--ink); }
+  .adv-table .dim-hint { display: block; font-size: 12px; color: var(--ink-3); font-weight: 400; margin-top: 2px; }
+  .adv-cell { display: inline-flex; align-items: center; gap: 6px; }
+  .tick { color: var(--qb-blue); font-weight: 700; }
+  .cross { color: var(--ink-3); }
+  .part  { color: var(--accent-amber); }
+  .qb-col { background: #F0F5FF; font-weight: 600; color: var(--qb-blue); }
+  .crown {
+    display: inline-block; background: var(--qb-blue); color: #fff;
+    font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-left: 6px;
+  }
+
+  /* ---------- 一句话定位 ---------- */
+  .statement {
+    background: linear-gradient(120deg, #0052D9, #3A6FF8);
+    color: #fff; padding: 60px 60px;
+    border-radius: 20px; text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .statement::before, .statement::after {
+    content: ''; position: absolute; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,.15), transparent 70%);
+  }
+  .statement::before { width: 300px; height: 300px; top: -120px; left: -80px; }
+  .statement::after  { width: 260px; height: 260px; bottom: -100px; right: -60px; }
+  .statement-label {
+    font-size: 13px; letter-spacing: 4px; opacity: .85; margin-bottom: 16px;
+    position: relative; z-index: 2;
+  }
+  .statement-text {
+    font-size: 32px; font-weight: 700; line-height: 1.5;
+    max-width: 900px; margin: 0 auto;
+    position: relative; z-index: 2;
+  }
+  .statement-text .k { color: #FFD666; }
+  .statement-foot {
+    margin-top: 24px; font-size: 14px; opacity: .85;
+    position: relative; z-index: 2;
+  }
+
+  /* ---------- 5 环节主图 ---------- */
+  .pillars-hero {
+    background: var(--white); border: 1px solid var(--line);
+    border-radius: 14px; padding: 40px; overflow: hidden;
+  }
+  .pillars-hero svg { display: block; width: 100%; height: auto; }
+
+  /* ---------- 环节详情卡片 ---------- */
+  .pillar-detail {
+    display: grid; grid-template-columns: 300px 1fr; gap: 36px;
+    align-items: start;
+    margin-top: 32px;
+  }
+  .pillar-side {
+    background: var(--qb-blue); color: #fff;
+    border-radius: 12px; padding: 28px; position: sticky; top: 20px;
+  }
+  .pillar-side .num {
+    font-size: 44px; font-weight: 800; opacity: .4; line-height: 1;
+  }
+  .pillar-side .name {
+    font-size: 22px; font-weight: 700; margin: 6px 0 10px;
+  }
+  .pillar-side .conclusion {
+    font-size: 15px; font-weight: 600; line-height: 1.6;
+    padding: 12px 14px; background: rgba(255,255,255,0.14);
+    border-radius: 8px; margin: 10px 0 14px;
+  }
+  .pillar-side .q {
+    font-size: 13px; opacity: .85; line-height: 1.7;
+    border-top: 1px solid rgba(255,255,255,0.2); padding-top: 12px;
+  }
+  .pillar-side .q b { opacity: 1; font-weight: 600; display: block; margin-bottom: 4px; }
+  .pillar-body {}
+  .pillar-body h4 {
+    font-size: 16px; color: var(--qb-blue); margin-bottom: 12px; margin-top: 22px;
+  }
+  .pillar-body h4:first-child { margin-top: 0; }
+  .pillar-body ul { list-style: none; }
+  .pillar-body ul li {
+    padding: 8px 0 8px 22px; font-size: 14px; color: var(--ink-2);
+    position: relative; line-height: 1.7;
+  }
+  .pillar-body ul li::before {
+    content: ''; position: absolute; left: 4px; top: 17px; width: 8px; height: 8px;
+    border: 2px solid var(--qb-blue); border-radius: 2px; transform: rotate(45deg);
+  }
+  .pillar-reason {
+    margin-top: 22px; padding: 16px 18px;
+    background: #FFF8E8; border-left: 3px solid var(--accent-amber);
+    font-size: 13.5px; color: var(--ink); line-height: 1.8;
+    border-radius: 0 8px 8px 0;
+  }
+  .pillar-reason b { color: var(--accent-amber); }
+
+  /* 环节 ②：召唤方式并列图 */
+  .summon-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+    margin: 8px 0 14px;
+  }
+  .summon-item {
+    background: var(--qb-blue-soft); border: 1px solid var(--line);
+    padding: 14px; border-radius: 10px; text-align: center;
+  }
+  .summon-item .ic { font-size: 22px; margin-bottom: 6px; }
+  .summon-item .ttl { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .summon-arrow {
+    text-align: center; font-size: 20px; color: var(--qb-blue); margin: 8px 0;
+  }
+  .summon-dest {
+    text-align: center; padding: 14px; background: var(--qb-blue); color: #fff;
+    border-radius: 10px; font-size: 14px; font-weight: 600;
+  }
+
+  /* 环节 ③：能力分层 */
+  .layer-stack { margin: 8px 0; }
+  .layer-row {
+    display: flex; align-items: center; gap: 16px; padding: 14px 18px;
+    border: 1px solid var(--line); border-radius: 10px; margin-bottom: 8px;
+    background: var(--white);
+  }
+  .layer-tag {
+    background: var(--qb-blue); color: #fff; font-weight: 700;
+    font-size: 12px; padding: 4px 10px; border-radius: 4px; min-width: 52px;
+    text-align: center;
+  }
+  .layer-row.l2 .layer-tag { background: var(--qb-blue-2); }
+  .layer-row.l3 .layer-tag { background: var(--qb-blue-3); }
+  .layer-row.l4 .layer-tag { background: #B3CDFF; color: var(--qb-blue); }
+  .layer-name { font-weight: 700; font-size: 14px; min-width: 140px; }
+  .layer-desc { font-size: 13px; color: var(--ink-2); flex: 1; }
+  .layer-ai  { font-size: 12px; color: var(--ink-3); }
+
+  /* 环节 ④：两态对比 */
+  .state-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 8px 0 14px;
+  }
+  .state-card {
+    background: var(--white); border: 1px solid var(--line);
+    border-radius: 10px; padding: 20px;
+  }
+  .state-card.edit { border-color: var(--qb-blue); background: var(--qb-blue-soft); }
+  .state-name { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+  .state-name .dot {
+    display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+    background: var(--qb-blue); margin-right: 6px; vertical-align: middle;
+  }
+  .state-card.origin .state-name .dot { background: var(--ink-3); }
+  .state-desc { font-size: 13px; color: var(--ink-2); line-height: 1.7; }
+
+  .dest-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+  }
+  .dest-item {
+    padding: 14px; background: var(--white); border: 1px solid var(--line);
+    border-radius: 10px; text-align: center;
+  }
+  .dest-item .ic { font-size: 22px; color: var(--qb-blue); margin-bottom: 6px; }
+  .dest-item .ttl { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .dest-item .hint { font-size: 12px; color: var(--ink-3); }
+  .dest-item.future { border-style: dashed; opacity: .85; }
+  .dest-item.future .ttl::after { content: '（未来）'; color: var(--ink-3); font-weight: 400; font-size: 11px; }
+
+  /* 环节 ⑤：飞轮 */
+  .flywheel {
+    background: var(--white); border: 1px solid var(--line);
+    border-radius: 12px; padding: 28px;
+  }
+
+  /* ---------- 一期闭环 ---------- */
+  .phase-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start;
+  }
+  .phase-main {
+    background: var(--white); border: 2px solid var(--qb-blue);
+    border-radius: 12px; padding: 28px;
+  }
+  .phase-badge {
+    display: inline-block; background: var(--qb-blue); color: #fff;
+    font-size: 11px; font-weight: 700; letter-spacing: 2px;
+    padding: 4px 12px; border-radius: 4px; margin-bottom: 12px;
+  }
+  .phase-title { font-size: 22px; font-weight: 700; margin-bottom: 14px; }
+  .phase-reason { font-size: 13.5px; color: var(--ink-2); line-height: 1.8; margin-bottom: 18px; }
+  .phase-pillars { font-size: 13px; }
+  .phase-pillar-row {
+    display: flex; align-items: center; gap: 12px; padding: 10px 0;
+    border-top: 1px dashed var(--line);
+  }
+  .phase-pillar-row:first-child { border-top: none; }
+  .phase-pillar-tag {
+    font-size: 11px; font-weight: 700; color: var(--qb-blue);
+    background: var(--qb-blue-bg); padding: 3px 8px; border-radius: 4px;
+    min-width: 60px; text-align: center;
+  }
+  .phase-pillar-desc { color: var(--ink-2); line-height: 1.6; }
+
+  .phase-alt {
+    background: var(--bg); border-radius: 12px; padding: 24px;
+  }
+  .phase-alt h4 { font-size: 14px; color: var(--ink-3); margin-bottom: 14px; letter-spacing: 2px; }
+  .alt-item { padding: 14px 0; border-top: 1px dashed var(--line); }
+  .alt-item:first-of-type { border-top: none; padding-top: 4px; }
+  .alt-item .n { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .alt-item .d { font-size: 13px; color: var(--ink-2); line-height: 1.7; }
+
+  /* ---------- 资源清单 ---------- */
+  .res-table {
+    width: 100%; border-collapse: separate; border-spacing: 0;
+    background: var(--white); border: 1px solid var(--line); border-radius: 12px;
+    overflow: hidden; font-size: 14px;
+  }
+  .res-table th, .res-table td {
+    padding: 14px 18px; text-align: left; border-bottom: 1px solid var(--line);
+  }
+  .res-table thead th { background: var(--bg); font-weight: 600; color: var(--ink-2); font-size: 13px; }
+  .res-table tbody tr:last-child td { border-bottom: none; }
+  .res-table tbody tr:hover { background: var(--qb-blue-soft); }
+  .res-icon { color: var(--qb-blue); font-weight: 700; margin-right: 6px; }
+
+  /* ---------- 自检 ---------- */
+  .check-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
+  }
+  .check-card {
+    background: var(--white); border: 1px solid var(--line); border-radius: 12px;
+    padding: 22px;
+  }
+  .check-q {
+    font-size: 14px; color: var(--ink-3); margin-bottom: 8px;
+  }
+  .check-a {
+    font-size: 15px; font-weight: 600; color: var(--ink); line-height: 1.7;
+  }
+  .check-a em {
+    font-style: normal; color: var(--qb-blue);
+  }
+
+  /* ---------- footer ---------- */
+  footer {
+    background: #1D2129; color: #fff; padding: 40px 80px;
+    font-size: 13px; opacity: .85;
+  }
+  footer .f-row { display: flex; justify-content: space-between; align-items: center; }
+  footer b { opacity: 1; font-weight: 600; }
+
+  /* 章节末尾承上启下 */
+  .bridge {
+    margin-top: 32px; padding: 14px 20px;
+    background: var(--qb-blue-soft); border-radius: 10px;
+    font-size: 14px; color: var(--qb-blue); font-weight: 600;
+    text-align: right; letter-spacing: .5px;
+  }
+  .bridge::after { content: '　↓'; }
+
+  /* 小工具类 */
+  .mt-16 { margin-top: 16px; }
+  .mt-24 { margin-top: 24px; }
+  .mb-8  { margin-bottom: 8px; }
+  .hl    { color: var(--qb-blue); font-weight: 700; }
+  .warn  { color: var(--accent-warn); font-weight: 700; }
+
+  /* ========== 评论系统 ========== */
+  section { position: relative; }
+  section:hover > .cmt-btn { opacity: 1; }
+  .cmt-btn {
+    position: absolute; top: 20px; right: 20px;
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--white); border: 1px solid var(--line);
+    color: var(--qb-blue); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; opacity: 0; transition: opacity .2s, transform .15s, box-shadow .15s;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+    z-index: 50;
+  }
+  .cmt-btn:hover { transform: scale(1.08); box-shadow: 0 4px 14px rgba(0,82,217,.2); }
+  .cmt-btn.has-comment { opacity: 1; background: var(--qb-blue); color: #fff; border-color: var(--qb-blue); }
+  .cmt-btn .dot {
+    position: absolute; top: -4px; right: -4px;
+    min-width: 18px; height: 18px; border-radius: 9px; padding: 0 5px;
+    background: var(--accent-warn); color: #fff; font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid #fff;
+  }
+  .cmt-panel {
+    position: absolute; top: 64px; right: 20px; z-index: 60;
+    width: 340px; background: var(--white); border: 1px solid var(--line);
+    border-radius: 12px; padding: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.12);
+    display: none;
+  }
+  .cmt-panel.open { display: block; }
+  .cmt-panel h5 { font-size: 13px; color: var(--ink-3); margin-bottom: 10px; letter-spacing: 1px; }
+  .cmt-list { max-height: 220px; overflow-y: auto; margin-bottom: 12px; }
+  .cmt-list .cmt-item {
+    background: var(--qb-blue-soft); border-left: 3px solid var(--qb-blue);
+    padding: 8px 12px; margin-bottom: 8px; border-radius: 0 6px 6px 0;
+    font-size: 13px; color: var(--ink); line-height: 1.6; position: relative;
+  }
+  .cmt-list .cmt-item .cmt-time { font-size: 11px; color: var(--ink-3); margin-bottom: 2px; display: block; }
+  .cmt-list .cmt-item .cmt-del {
+    position: absolute; top: 6px; right: 6px; cursor: pointer; color: var(--ink-3);
+    font-size: 12px; opacity: 0; transition: opacity .15s;
+  }
+  .cmt-list .cmt-item:hover .cmt-del { opacity: 1; }
+  .cmt-list .cmt-item .cmt-del:hover { color: var(--accent-warn); }
+  .cmt-input {
+    width: 100%; border: 1px solid var(--line); border-radius: 8px;
+    padding: 10px 12px; font-size: 13px; font-family: inherit;
+    resize: vertical; min-height: 64px; max-height: 180px;
+    color: var(--ink);
+  }
+  .cmt-input:focus { outline: none; border-color: var(--qb-blue); }
+  .cmt-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+  .cmt-actions .cmt-hint { font-size: 11px; color: var(--ink-3); }
+  .cmt-actions .cmt-save {
+    background: var(--qb-blue); color: #fff; border: none; border-radius: 6px;
+    padding: 6px 14px; font-size: 13px; cursor: pointer; font-weight: 600;
+  }
+  .cmt-actions .cmt-save:hover { background: var(--qb-blue-2); }
+
+  /* 右下固定"导出评论" */
+  .cmt-export {
+    position: fixed; right: 28px; bottom: 28px; z-index: 100;
+    background: var(--qb-blue); color: #fff; border: none; border-radius: 28px;
+    padding: 12px 20px; font-size: 14px; font-weight: 600; cursor: pointer;
+    box-shadow: 0 6px 20px rgba(0,82,217,.3); font-family: inherit;
+    display: flex; align-items: center; gap: 8px;
+    transition: transform .15s, box-shadow .15s;
+  }
+  .cmt-export:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,82,217,.4); }
+  .cmt-export .badge {
+    background: #fff; color: var(--qb-blue); font-weight: 700;
+    min-width: 22px; height: 22px; padding: 0 6px;
+    border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 12px;
+  }
+
+  /* 导出 toast */
+  .cmt-toast {
+    position: fixed; left: 50%; top: 40px; transform: translateX(-50%);
+    background: var(--ink); color: #fff; padding: 12px 20px; border-radius: 8px;
+    font-size: 14px; box-shadow: 0 4px 16px rgba(0,0,0,.2); z-index: 200;
+    opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s;
+  }
+  .cmt-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- ========== 封面 ========== -->
+<section class="cover">
+  <div class="cover-label">QQ 浏览器 · 元宝助手二期 · 二次编辑专项</div>
+  <h1>浏览器 AI<br/>看改一体<span>工作台</span></h1>
+  <p class="cover-sub">
+    在 AI 时代，让浏览器成为任何格式内容的"展示-编辑-交付"统一工作台。<br/>
+    展示是默认态，编辑是临时召唤的状态，AI 是能力上限不是产品中心。
+  </p>
+  <div class="cover-meta">
+    <div><b>Owner</b>　黎明睿</div>
+    <div><b>呈报</b>　汉博</div>
+    <div><b>日期</b>　2026-05-12</div>
+    <div><b>版本</b>　v1 · 方案稿</div>
+  </div>
+</section>
+
+<!-- ========== 0 | 行业三股力量 ========== -->
+<section>
+  <div class="sec-head">
+    <span class="sec-num">0.1　INDUSTRY</span>
+    <h2 class="sec-title">AI 生成内容正在走向"网页化"，用户正在要求"生成完还能改"</h2>
+    <p class="sec-sub">过去几个月行业发生了三件事——合起来指向同一个结论：<b style="color: var(--qb-blue);">AI 时代"内容消费 + 改造"的主场，天然是浏览器。</b></p>
+  </div>
+
+  <div class="force-grid">
+
+    <!-- 卡 1：HTML 取代 Markdown -->
+    <div class="force-card">
+      <span class="force-tag">输出格式</span>
+      <h3 class="force-title">HTML 正在取代 Markdown 成为 AI 默认输出</h3>
+
+      <div class="force-vis">
+        <svg viewBox="0 0 280 96" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrInd1" markerWidth="8" markerHeight="8" refX="7" refY="2.5" orient="auto">
+              <path d="M0,0 L0,5 L7,2.5 z" fill="#0052D9"/>
+            </marker>
+          </defs>
+          <!-- 时间线 -->
+          <line x1="20" y1="70" x2="260" y2="70" stroke="#B3CDFF" stroke-width="1.5"/>
+          <circle cx="60"  cy="70" r="4" fill="#86909C"/>
+          <circle cx="200" cy="70" r="5" fill="#0052D9"/>
+          <text x="60" y="90" font-size="10" fill="#86909C" text-anchor="middle" font-family="PingFang SC">过去</text>
+          <text x="200" y="90" font-size="10" fill="#0052D9" text-anchor="middle" font-family="PingFang SC" font-weight="600">现在</text>
+          <!-- 左：MD 文档示意 -->
+          <g>
+            <rect x="30" y="14" width="60" height="44" rx="3" fill="#fff" stroke="#86909C"/>
+            <line x1="38" y1="22" x2="78" y2="22" stroke="#C9CDD4" stroke-width="2"/>
+            <line x1="38" y1="30" x2="72" y2="30" stroke="#C9CDD4" stroke-width="1.5"/>
+            <line x1="38" y1="38" x2="80" y2="38" stroke="#C9CDD4" stroke-width="1.5"/>
+            <line x1="38" y1="46" x2="68" y2="46" stroke="#C9CDD4" stroke-width="1.5"/>
+            <text x="60" y="11" font-size="9" fill="#86909C" text-anchor="middle" font-family="PingFang SC">Markdown</text>
+          </g>
+          <!-- 箭头 -->
+          <path d="M100,38 L160,38" stroke="#0052D9" stroke-width="2" fill="none" marker-end="url(#arrInd1)"/>
+          <!-- 右：HTML 网页示意 -->
+          <g>
+            <rect x="170" y="8" width="80" height="56" rx="3" fill="#fff" stroke="#0052D9"/>
+            <rect x="170" y="8" width="80" height="9" fill="#EAF2FF"/>
+            <circle cx="175" cy="12.5" r="1.5" fill="#0052D9"/>
+            <circle cx="180" cy="12.5" r="1.5" fill="#4080FF"/>
+            <rect x="174" y="22" width="40" height="6" fill="#0052D9"/>
+            <rect x="174" y="32" width="72" height="3" fill="#C9CDD4"/>
+            <rect x="174" y="38" width="60" height="3" fill="#C9CDD4"/>
+            <rect x="174" y="46" width="32" height="14" fill="#EAF2FF" stroke="#B3CDFF"/>
+            <rect x="212" y="46" width="32" height="14" fill="#EAF2FF" stroke="#B3CDFF"/>
+            <text x="210" y="5" font-size="9" fill="#0052D9" text-anchor="middle" font-family="PingFang SC" font-weight="600">HTML 网页</text>
+          </g>
+        </svg>
+      </div>
+
+      <p class="force-desc">
+        Anthropic 工程师 Thariq 引爆、Karpathy 跟进的行业讨论：HTML 在<b>排版、表格、图表、交互、分享</b>上全面优于纯文本。AI 输出从"一段文字"变成"一个网页"。
+      </p>
+    </div>
+
+    <!-- 卡 2：生成 + 编辑被打通 -->
+    <div class="force-card">
+      <span class="force-tag">产品形态</span>
+      <h3 class="force-title">"生成 + 编辑"被打通成产品主线</h3>
+
+      <div class="force-vis">
+        <svg viewBox="0 0 280 96" xmlns="http://www.w3.org/2000/svg">
+          <!-- 4 个产品 logo 块 -->
+          <g font-family="PingFang SC" font-size="11" font-weight="600">
+            <rect x="14"  y="16" width="56" height="64" rx="6" fill="#fff" stroke="#0052D9"/>
+            <text x="42" y="42" text-anchor="middle" fill="#0052D9">Lovart</text>
+            <text x="42" y="60" text-anchor="middle" font-size="9" fill="#4E5969">点选+AI</text>
+
+            <rect x="78"  y="16" width="56" height="64" rx="6" fill="#fff" stroke="#0052D9"/>
+            <text x="106" y="42" text-anchor="middle" fill="#0052D9">v0 / bolt</text>
+            <text x="106" y="60" text-anchor="middle" font-size="9" fill="#4E5969">文字→HTML</text>
+
+            <rect x="142" y="16" width="56" height="64" rx="6" fill="#fff" stroke="#0052D9"/>
+            <text x="170" y="42" text-anchor="middle" fill="#0052D9">Cursor</text>
+            <text x="170" y="60" text-anchor="middle" font-size="9" fill="#4E5969">改/接受</text>
+
+            <rect x="206" y="16" width="56" height="64" rx="6" fill="#fff" stroke="#0052D9"/>
+            <text x="234" y="42" text-anchor="middle" fill="#0052D9">Artifacts</text>
+            <text x="234" y="60" text-anchor="middle" font-size="9" fill="#4E5969">即生成即改</text>
+          </g>
+        </svg>
+      </div>
+
+      <p class="force-desc">
+        这几款产品有一个共同特征：<b>编辑能力不是附加功能，是产品主线本身</b>。AI 给出第一版后，用户在原地继续点选、对话、调整，不需要导出到别的工具。
+      </p>
+    </div>
+
+    <!-- 卡 3：协同被锁围墙 -->
+    <div class="force-card">
+      <span class="force-tag">市场空白</span>
+      <h3 class="force-title">主流编辑产品，全部锁在自家围墙里</h3>
+
+      <div class="force-vis">
+        <svg viewBox="0 0 280 96" xmlns="http://www.w3.org/2000/svg">
+          <!-- 三道围墙 -->
+          <g font-family="PingFang SC" font-size="10">
+            <rect x="14"  y="16" width="78" height="64" rx="4" fill="#FFF8E8" stroke="#E6A23C"/>
+            <text x="53" y="34" text-anchor="middle" font-weight="600" fill="#7A4A00">飞书画板</text>
+            <text x="53" y="52" text-anchor="middle" fill="#7A4A00" font-size="9">必须在飞书</text>
+            <text x="53" y="68" text-anchor="middle" fill="#7A4A00" font-size="9">🔒</text>
+
+            <rect x="100" y="16" width="78" height="64" rx="4" fill="#FFF8E8" stroke="#E6A23C"/>
+            <text x="139" y="34" text-anchor="middle" font-weight="600" fill="#7A4A00">Notion AI</text>
+            <text x="139" y="52" text-anchor="middle" fill="#7A4A00" font-size="9">必须在 Notion</text>
+            <text x="139" y="68" text-anchor="middle" fill="#7A4A00" font-size="9">🔒</text>
+
+            <rect x="186" y="16" width="78" height="64" rx="4" fill="#FFF8E8" stroke="#E6A23C"/>
+            <text x="225" y="34" text-anchor="middle" font-weight="600" fill="#7A4A00">Smart Canvas</text>
+            <text x="225" y="52" text-anchor="middle" fill="#7A4A00" font-size="9">必须在 Docs</text>
+            <text x="225" y="68" text-anchor="middle" fill="#7A4A00" font-size="9">🔒</text>
+          </g>
+        </svg>
+      </div>
+
+      <p class="force-desc">
+        飞书 / Notion / Google 都做了 AI 编辑，但用户必须先<b>进它的生态</b>才能用。"<b>用户在网上看到一份东西，原地想改</b>"——这个最普遍的场景，目前没有任何产品在解。
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ========== 0.2 业务教训 ========== -->
+<section class="soft">
+  <div class="sec-head">
+    <span class="sec-num">0.2　OURSELVES</span>
+    <h2 class="sec-title">浏览器要做的这件事，就是"二次编辑"</h2>
+    <p class="sec-sub">历史教训告诉我们怎么做，5 大场景告诉我们必须做。</p>
+  </div>
+
+  <div class="lesson-row">
+    <!-- 教训 -->
+    <div class="lesson-card warn">
+      <div class="lesson-head">
+        <span class="lesson-chip">教训</span>
+        <h3 class="lesson-title">AI PPT 把 AI 做成了产品中心，模型一升级就全盘作废</h3>
+      </div>
+
+      <!-- 教训卡 SVG：能力积累 → 模型升级 → 归零 -->
+      <div class="force-vis" style="background: #FFECE8; margin-bottom: 14px;">
+        <svg viewBox="0 0 280 90" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrWarn" markerWidth="8" markerHeight="8" refX="7" refY="2.5" orient="auto">
+              <path d="M0,0 L0,5 L7,2.5 z" fill="#F53F3F"/>
+            </marker>
+          </defs>
+          <g font-family="PingFang SC" font-size="10">
+            <!-- 左：大半年积累 -->
+            <rect x="14" y="20" width="72" height="54" rx="4" fill="#fff" stroke="#F53F3F"/>
+            <text x="50" y="36" text-anchor="middle" font-weight="600" fill="#1D2129">AI PPT</text>
+            <text x="50" y="50" text-anchor="middle" fill="#4E5969">大半年</text>
+            <text x="50" y="62" text-anchor="middle" fill="#4E5969">能力积累</text>
+
+            <!-- 中：事件 -->
+            <path d="M90,50 L136,50" stroke="#F53F3F" stroke-width="1.5" fill="none" marker-end="url(#arrWarn)"/>
+            <text x="113" y="32" text-anchor="middle" fill="#F53F3F" font-weight="600">模型升级</text>
+            <text x="113" y="46" text-anchor="middle" fill="#F53F3F">HTML 输出</text>
+
+            <!-- 右：归零 -->
+            <rect x="144" y="20" width="122" height="54" rx="4" fill="#fff" stroke="#F53F3F" stroke-dasharray="3 3"/>
+            <text x="205" y="40" text-anchor="middle" fill="#F53F3F" font-weight="700" font-size="13">能力积累 → 归零</text>
+            <text x="205" y="58" text-anchor="middle" fill="#86909C">框架跟模型绑得太死</text>
+          </g>
+        </svg>
+      </div>
+
+      <p class="lesson-desc" style="margin-bottom:0;">
+        模型决定产品形态，模型一变，产品骨架直接垮。<br/>
+        <b>这次必须反过来：</b>框架决定形态，AI 只决定上限。模型怎么迭代，框架都立得住。
+      </p>
+    </div>
+
+    <!-- 共识 -->
+    <div class="lesson-card ok">
+      <div class="lesson-head">
+        <span class="lesson-chip ok">共识</span>
+        <h3 class="lesson-title">元宝二期 5 大场景，4 个明文写了"支持二次编辑"</h3>
+      </div>
+
+      <!-- 共识卡 SVG：5 场景列表，4 个勾 -->
+      <div class="force-vis" style="margin-bottom: 14px;">
+        <svg viewBox="0 0 280 96" xmlns="http://www.w3.org/2000/svg">
+          <g font-family="PingFang SC" font-size="11">
+            <!-- 智能阅读器 - 弱 -->
+            <rect x="14"  y="8"  width="252" height="16" rx="3" fill="#fff" stroke="#C9CDD4"/>
+            <circle cx="24" cy="16" r="4" fill="#C9CDD4"/>
+            <text x="34" y="19" fill="#86909C">智能阅读器</text>
+            <text x="255" y="19" text-anchor="end" fill="#86909C" font-size="9">编辑诉求弱</text>
+
+            <!-- 多网页分析生成器 ✓ -->
+            <rect x="14"  y="28" width="252" height="16" rx="3" fill="#EAF2FF" stroke="#0052D9"/>
+            <circle cx="24" cy="36" r="5" fill="#0052D9"/>
+            <path d="M21,36 L23.5,38.5 L27.5,34" stroke="#fff" stroke-width="1.5" fill="none"/>
+            <text x="34" y="39" fill="#0052D9" font-weight="600">多网页分析生成器</text>
+            <text x="255" y="39" text-anchor="end" fill="#0052D9" font-size="9">要自由编辑</text>
+
+            <!-- 智能收藏与归纳 ✓ -->
+            <rect x="14"  y="48" width="252" height="16" rx="3" fill="#EAF2FF" stroke="#0052D9"/>
+            <circle cx="24" cy="56" r="5" fill="#0052D9"/>
+            <path d="M21,56 L23.5,58.5 L27.5,54" stroke="#fff" stroke-width="1.5" fill="none"/>
+            <text x="34" y="59" fill="#0052D9" font-weight="600">智能收藏与归纳</text>
+            <text x="255" y="59" text-anchor="end" fill="#0052D9" font-size="9">要分类再整理</text>
+
+            <!-- 视频萃取器 ✓ -->
+            <rect x="14"  y="68" width="252" height="16" rx="3" fill="#EAF2FF" stroke="#0052D9"/>
+            <circle cx="24" cy="76" r="5" fill="#0052D9"/>
+            <path d="M21,76 L23.5,78.5 L27.5,74" stroke="#fff" stroke-width="1.5" fill="none"/>
+            <text x="34" y="79" fill="#0052D9" font-weight="600">网页视频萃取器</text>
+            <text x="255" y="79" text-anchor="end" fill="#0052D9" font-size="9">要二编字幕/笔记</text>
+
+            <!-- 图片编辑 ✓ -->
+            <rect x="14"  y="88" width="252" height="8" rx="2" fill="#EAF2FF" stroke="#0052D9"/>
+          </g>
+        </svg>
+      </div>
+
+      <p class="lesson-desc" style="margin-bottom:0;">
+        5 个场景有 4 个明文点名要这件事——多网页分析要"自然语言+点选元素编辑"、图片编辑要"分元素修改"。<br/>
+        <b>这步不打通，前面所有能力都卡在"生成完了之后然后呢"。</b>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 0.3 浏览器四件套 ========== -->
+<section>
+  <div class="sec-head">
+    <span class="sec-num">0.3　WHY BROWSER</span>
+    <h2 class="sec-title">做二次编辑这件事，浏览器手里有 4 张牌，其他产品都凑不齐</h2>
+    <p class="sec-sub">4 张牌分别是：<b>先看、能改、管副本、懂你</b>——前三张是基本功，第四张是护城河。</p>
+  </div>
+
+  <!-- 浏览器持有的资产池可视化 -->
+  <div style="background: var(--white); border: 1px solid var(--line); border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+    <div style="font-size: 14px; color: var(--ink-3); margin-bottom: 14px; letter-spacing: 1px;">用户在浏览器里"顺便"留下的东西，是 AI 时代最值钱的上下文</div>
+    <svg viewBox="0 0 1080 200" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto;">
+      <defs>
+        <linearGradient id="ctxAsset" x1="0" x2="1">
+          <stop offset="0" stop-color="#0052D9"/>
+          <stop offset="1" stop-color="#4080FF"/>
+        </linearGradient>
+        <marker id="arrCtx" markerWidth="8" markerHeight="8" refX="7" refY="2.5" orient="auto">
+          <path d="M0,0 L0,5 L7,2.5 z" fill="#0052D9"/>
+        </marker>
+      </defs>
+      <g font-family="PingFang SC">
+        <!-- 用户日常行为：4 个圆角块 -->
+        <rect x="40" y="20" width="140" height="60" rx="8" fill="#EAF2FF" stroke="#B3CDFF"/>
+        <text x="110" y="42" text-anchor="middle" font-size="13" fill="#1D2129" font-weight="600">浏览历史</text>
+        <text x="110" y="60" text-anchor="middle" font-size="11" fill="#4E5969">看过什么</text>
+
+        <rect x="200" y="20" width="140" height="60" rx="8" fill="#EAF2FF" stroke="#B3CDFF"/>
+        <text x="270" y="42" text-anchor="middle" font-size="13" fill="#1D2129" font-weight="600">收藏夹</text>
+        <text x="270" y="60" text-anchor="middle" font-size="11" fill="#4E5969">在意什么</text>
+
+        <rect x="360" y="20" width="140" height="60" rx="8" fill="#EAF2FF" stroke="#B3CDFF"/>
+        <text x="430" y="42" text-anchor="middle" font-size="13" fill="#1D2129" font-weight="600">下载 / 阅读时长</text>
+        <text x="430" y="60" text-anchor="middle" font-size="11" fill="#4E5969">认真看过什么</text>
+
+        <rect x="520" y="20" width="140" height="60" rx="8" fill="#EAF2FF" stroke="#B3CDFF"/>
+        <text x="590" y="42" text-anchor="middle" font-size="13" fill="#1D2129" font-weight="600">账号资产</text>
+        <text x="590" y="60" text-anchor="middle" font-size="11" fill="#4E5969">是哪种人</text>
+
+        <!-- 箭头汇聚 -->
+        <path d="M110,80  C110,110 380,110 540,140" stroke="#0052D9" stroke-width="1.5" fill="none"/>
+        <path d="M270,80  C270,110 380,110 540,140" stroke="#0052D9" stroke-width="1.5" fill="none"/>
+        <path d="M430,80  C430,110 460,110 540,140" stroke="#0052D9" stroke-width="1.5" fill="none"/>
+        <path d="M590,80  C590,110 580,110 580,140" stroke="#0052D9" stroke-width="1.5" fill="none"/>
+
+        <!-- 上下文池 -->
+        <rect x="380" y="138" width="320" height="44" rx="22" fill="url(#ctxAsset)"/>
+        <text x="540" y="166" text-anchor="middle" font-size="14" fill="#fff" font-weight="700">上下文池 · AI 真正"懂你"的原料</text>
+
+        <!-- 右侧对比 -->
+        <line x1="720" y1="20" x2="720" y2="190" stroke="#E5E6EB" stroke-dasharray="4 4"/>
+        <text x="900" y="36" text-anchor="middle" font-size="13" fill="#86909C" font-weight="600">而画板 / 画布产品</text>
+
+        <rect x="780" y="50" width="240" height="50" rx="6" fill="#FFF8E8" stroke="#E6A23C" stroke-dasharray="4 4"/>
+        <text x="900" y="72" text-anchor="middle" font-size="13" fill="#7A4A00" font-weight="600">空白起点</text>
+        <text x="900" y="90" text-anchor="middle" font-size="11" fill="#7A4A00">用户得自己 import 素材</text>
+
+        <text x="900" y="135" text-anchor="middle" font-size="12" fill="#F53F3F" font-weight="600">→ 改完即忘，没有"懂你"</text>
+        <text x="900" y="160" text-anchor="middle" font-size="11" fill="#86909C">每次都从零开始</text>
+      </g>
+    </svg>
+  </div>
+
+  <table class="adv-table">
+    <thead>
+      <tr>
+        <th style="width: 30%;">能力维度</th>
+        <th class="hl" style="width: 17%;">QQ 浏览器</th>
+        <th style="width: 17%;">Lovart</th>
+        <th style="width: 18%;">飞书 / Notion</th>
+        <th style="width: 18%;">Cursor</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="dim-name">先看：内容打开就是成品</span><span class="dim-hint">用户不需要先学工具，直接获取信息</span></td>
+        <td class="qb-col"><span class="tick">✓</span> 母语</td>
+        <td><span class="part">◐</span> 画布形态</td>
+        <td><span class="part">◐</span> 文档形态</td>
+        <td><span class="cross">✗</span></td>
+      </tr>
+      <tr>
+        <td><span class="dim-name">能改：在原内容上原地动手</span><span class="dim-hint">DOM/脚本天然支持给任意网页临时挂编辑层</span></td>
+        <td class="qb-col"><span class="tick">✓</span> 原生</td>
+        <td><span class="cross">✗</span></td>
+        <td><span class="cross">✗</span></td>
+        <td><span class="part">◐</span> 仅代码</td>
+      </tr>
+      <tr>
+        <td><span class="dim-name">管副本：改了能存能分享能找回</span><span class="dim-hint">URL / Tab / 账号天生管版本和分享</span></td>
+        <td class="qb-col"><span class="tick">✓</span> 天生</td>
+        <td><span class="part">◐</span> 锁自家</td>
+        <td><span class="cross">✗</span> 锁 IM/笔记</td>
+        <td><span class="cross">✗</span></td>
+      </tr>
+      <tr>
+        <td><span class="dim-name">懂你：知道你是谁、看过什么<span class="crown">关键</span></span><span class="dim-hint">浏览历史/收藏/账号资产沉淀的真实用户画像</span></td>
+        <td class="qb-col"><span class="tick">✓</span> 独有</td>
+        <td><span class="cross">✗</span></td>
+        <td><span class="cross">✗</span></td>
+        <td><span class="cross">✗</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="force-insight mt-24" style="max-width: 960px; font-size: 14px;">
+    前三件事，画板、笔记类产品咬咬牙能做成；<b>第四件"懂你"，只有浏览器天然具备</b>——<br/>
+    因为它不是让用户特地来"攒料"，而是用户在日常浏览里顺手就把料留下了。模型越强，这块护城河越深。
+  </div>
+</section>
+
+<!-- ========== 1 | 一句话定位 ========== -->
+<section class="soft" style="padding: 56px 80px;">
+  <div class="statement">
+    <div class="statement-label">PROJECT STATEMENT</div>
+    <div class="statement-text">
+      让浏览器成为任何格式内容<br/>
+      <span class="k">"展示 → 编辑 → 交付"</span>的统一工作台<br/>
+      <span style="font-size: 22px; opacity: .9;">展示是默认态 · 编辑是临时召唤的状态 · AI 是能力上限</span>
+    </div>
+    <div class="statement-foot">
+      AI 不在产品中心。模型怎么变，这个工作台都立得住。
+    </div>
+  </div>
+</section>
+
+<!-- ========== 2 | 5 环节主图 ========== -->
+<section>
+  <div class="sec-head">
+    <span class="sec-num">2　FRAMEWORK</span>
+    <h2 class="sec-title">把"看-改-交付"切成 5 个环节，AI 只放在第 3 个里</h2>
+    <p class="sec-sub">用户做"看到内容→改成自己想要的"这件事，必经 5 个环节。每个环节对应一个产品决策——这就是框架。<br/>这样切的好处：AI 只是其中第 3 环，模型怎么变，整体框架不动。</p>
+  </div>
+
+  <!-- 一张合成图：用户行为 → 5 环节（⑤ 长条托底） -->
+  <div style="background: var(--white); border: 1px solid var(--line); border-radius: 12px; padding: 28px; margin-bottom: 24px;">
+    <svg viewBox="0 0 1080 380" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto;">
+      <defs>
+        <linearGradient id="ctxGradV2" x1="0" x2="1">
+          <stop offset="0" stop-color="#0052D9"/>
+          <stop offset="1" stop-color="#4080FF"/>
+        </linearGradient>
+        <marker id="arrF1" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L9,3 z" fill="#0052D9"/>
+        </marker>
+      </defs>
+
+      <g font-family="PingFang SC">
+        <!-- 上：用户行为 -->
+        <text x="20" y="28" font-size="12" fill="#86909C" letter-spacing="1">① 先看用户在做什么</text>
+
+        <rect x="20"  y="46" width="246" height="44" rx="8" fill="#EAF2FF" stroke="#B3CDFF"/>
+        <text x="143" y="73" text-anchor="middle" font-size="14" fill="#1D2129" font-weight="600">看到一份内容</text>
+
+        <rect x="280" y="46" width="246" height="44" rx="8" fill="#EAF2FF" stroke="#B3CDFF"/>
+        <text x="403" y="73" text-anchor="middle" font-size="14" fill="#1D2129" font-weight="600">想动手改</text>
+
+        <rect x="540" y="46" width="246" height="44" rx="8" fill="#EAF2FF" stroke="#B3CDFF"/>
+        <text x="663" y="73" text-anchor="middle" font-size="14" fill="#1D2129" font-weight="600">具体改东西</text>
+
+        <rect x="800" y="46" width="260" height="44" rx="8" fill="#EAF2FF" stroke="#B3CDFF"/>
+        <text x="930" y="73" text-anchor="middle" font-size="14" fill="#1D2129" font-weight="600">改完要存 / 分享</text>
+
+        <path d="M266,68 L278,68" stroke="#0052D9" stroke-width="1.6" fill="none" marker-end="url(#arrF1)"/>
+        <path d="M526,68 L538,68" stroke="#0052D9" stroke-width="1.6" fill="none" marker-end="url(#arrF1)"/>
+        <path d="M786,68 L798,68" stroke="#0052D9" stroke-width="1.6" fill="none" marker-end="url(#arrF1)"/>
+
+        <!-- 中：4 个环节（对应用户行为）-->
+        <text x="20" y="125" font-size="12" fill="#0052D9" letter-spacing="1" font-weight="600">② 产品要解决</text>
+
+        <rect x="20"  y="142" width="246" height="76" rx="8" fill="#0052D9"/>
+        <text x="143" y="167" text-anchor="middle" font-size="12" fill="#fff" opacity=".85" letter-spacing="1">环节 ①</text>
+        <text x="143" y="189" text-anchor="middle" font-size="15" fill="#fff" font-weight="700">展示层</text>
+        <text x="143" y="208" text-anchor="middle" font-size="11" fill="#fff" opacity=".9">怎么展示得好看</text>
+
+        <rect x="280" y="142" width="246" height="76" rx="8" fill="#0052D9"/>
+        <text x="403" y="167" text-anchor="middle" font-size="12" fill="#fff" opacity=".85" letter-spacing="1">环节 ②</text>
+        <text x="403" y="189" text-anchor="middle" font-size="15" fill="#fff" font-weight="700">编辑态召唤</text>
+        <text x="403" y="208" text-anchor="middle" font-size="11" fill="#fff" opacity=".9">怎么进入编辑</text>
+
+        <rect x="540" y="142" width="246" height="76" rx="8" fill="#FF7D00"/>
+        <text x="663" y="167" text-anchor="middle" font-size="12" fill="#fff" opacity=".95" letter-spacing="1">环节 ③</text>
+        <text x="663" y="189" text-anchor="middle" font-size="15" fill="#fff" font-weight="700">编辑能力</text>
+        <text x="663" y="208" text-anchor="middle" font-size="11" fill="#fff" opacity=".95">★ AI 只在这一环</text>
+
+        <rect x="800" y="142" width="260" height="76" rx="8" fill="#0052D9"/>
+        <text x="930" y="167" text-anchor="middle" font-size="12" fill="#fff" opacity=".85" letter-spacing="1">环节 ④</text>
+        <text x="930" y="189" text-anchor="middle" font-size="15" fill="#fff" font-weight="700">副本与去向</text>
+        <text x="930" y="208" text-anchor="middle" font-size="11" fill="#fff" opacity=".9">改完去哪</text>
+
+        <!-- 映射虚线（行为 → 环节） -->
+        <line x1="143" y1="92" x2="143" y2="140" stroke="#86909C" stroke-dasharray="3 3"/>
+        <line x1="403" y1="92" x2="403" y2="140" stroke="#86909C" stroke-dasharray="3 3"/>
+        <line x1="663" y1="92" x2="663" y2="140" stroke="#86909C" stroke-dasharray="3 3"/>
+        <line x1="930" y1="92" x2="930" y2="140" stroke="#86909C" stroke-dasharray="3 3"/>
+
+        <!-- 下：⑤ 上下文引擎 长条托底 -->
+        <rect x="20" y="240" width="1040" height="58" rx="10" fill="url(#ctxGradV2)"/>
+        <text x="540" y="266" text-anchor="middle" font-size="13" fill="#fff" opacity=".9" letter-spacing="2">环节 ⑤ · 在背后贯穿 ①②③④</text>
+        <text x="540" y="288" text-anchor="middle" font-size="15" fill="#fff" font-weight="700">上下文引擎 · 让 AI 越用越懂你</text>
+
+        <!-- 底部结论 -->
+        <text x="540" y="332" text-anchor="middle" font-size="14" fill="#0052D9" font-weight="700">✦ AI 只在橙色的环节 ③。模型怎么变，其他 4 环和整体框架都不动</text>
+        <text x="540" y="358" text-anchor="middle" font-size="12" fill="#86909C">5 个环节一起决定完整体验，缺一不可</text>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<!-- ========== 环节 ① ========== -->
+<section class="soft">
+  <div class="pillar-detail">
+    <div class="pillar-side">
+      <div class="num">01</div>
+      <div class="name">展示层</div>
+      <div class="conclusion">内容进浏览器，<br/>先成"好看的网页"，<br/>编辑工具不露脸。</div>
+      <div class="q"><b>这个环节回答：</b>用户打开内容，第一眼看到什么？</div>
+    </div>
+    <div class="pillar-body">
+      <h4>规则</h4>
+      <ul>
+        <li>进到浏览器即可读、好看、可分享</li>
+        <li>不出现编辑工具栏、AI 不默认露脸</li>
+        <li>抽取出的结构化数据，套模板渲染成可读网页</li>
+      </ul>
+      <h4>对比一下：浏览器和画板，第一眼看到的不是同一种东西</h4>
+      <div style="margin: 8px 0 14px;">
+        <svg viewBox="0 0 540 130" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto;">
+          <!-- 画板态 -->
+          <g font-family="PingFang SC">
+            <rect x="10" y="10" width="240" height="100" rx="6" fill="#FFF8E8" stroke="#E6A23C"/>
+            <text x="20" y="28" font-size="11" fill="#7A4A00" font-weight="600">Figma / Lovart / Canva</text>
+            <!-- 工具栏密集 -->
+            <rect x="20" y="38" width="14" height="14" rx="2" fill="#fff" stroke="#E6A23C"/>
+            <rect x="38" y="38" width="14" height="14" rx="2" fill="#fff" stroke="#E6A23C"/>
+            <rect x="56" y="38" width="14" height="14" rx="2" fill="#fff" stroke="#E6A23C"/>
+            <rect x="74" y="38" width="14" height="14" rx="2" fill="#fff" stroke="#E6A23C"/>
+            <rect x="92" y="38" width="14" height="14" rx="2" fill="#fff" stroke="#E6A23C"/>
+            <rect x="20" y="58" width="86" height="44" rx="2" fill="#fff" stroke="#E6A23C" stroke-dasharray="3 3"/>
+            <text x="63" y="84" font-size="10" fill="#7A4A00" text-anchor="middle">空画布</text>
+            <!-- 右侧属性面板 -->
+            <rect x="120" y="38" width="120" height="64" rx="2" fill="#fff" stroke="#E6A23C"/>
+            <line x1="130" y1="50" x2="220" y2="50" stroke="#E6A23C" stroke-width="1"/>
+            <line x1="130" y1="60" x2="200" y2="60" stroke="#E6A23C" stroke-width="1"/>
+            <line x1="130" y1="70" x2="220" y2="70" stroke="#E6A23C" stroke-width="1"/>
+            <line x1="130" y1="80" x2="180" y2="80" stroke="#E6A23C" stroke-width="1"/>
+            <line x1="130" y1="90" x2="200" y2="90" stroke="#E6A23C" stroke-width="1"/>
+            <text x="130" y="124" font-size="11" fill="#7A4A00">第一眼：满屏工具</text>
+          </g>
+          <!-- 浏览器态 -->
+          <g font-family="PingFang SC">
+            <rect x="290" y="10" width="240" height="100" rx="6" fill="#EAF2FF" stroke="#0052D9"/>
+            <text x="300" y="28" font-size="11" fill="#0052D9" font-weight="600">浏览器</text>
+            <!-- 完整网页内容 -->
+            <rect x="300" y="38" width="220" height="60" rx="3" fill="#fff" stroke="#0052D9"/>
+            <rect x="308" y="44" width="80" height="8" fill="#0052D9"/>
+            <rect x="308" y="56" width="200" height="3" fill="#C9CDD4"/>
+            <rect x="308" y="62" width="180" height="3" fill="#C9CDD4"/>
+            <rect x="308" y="68" width="190" height="3" fill="#C9CDD4"/>
+            <rect x="308" y="76" width="60" height="18" fill="#EAF2FF" stroke="#B3CDFF"/>
+            <rect x="372" y="76" width="60" height="18" fill="#EAF2FF" stroke="#B3CDFF"/>
+            <rect x="436" y="76" width="60" height="18" fill="#EAF2FF" stroke="#B3CDFF"/>
+            <text x="300" y="124" font-size="11" fill="#0052D9">第一眼：完整内容</text>
+          </g>
+        </svg>
+      </div>
+      <div class="pillar-reason">
+        <b>这个环节不能省的理由：</b>展示态做不好，后面四根环节都是空中楼阁——用户连看都没看爽，没有任何动力进入下一步。
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 环节 ② ========== -->
+<section>
+  <div class="pillar-detail">
+    <div class="pillar-side">
+      <div class="num">02</div>
+      <div class="name">编辑态召唤</div>
+      <div class="conclusion">进入编辑可以走 4 条路，<br/>但都汇到同一个<br/>"我改的"副本上。</div>
+      <div class="q"><b>这个环节回答：</b>用户想改，怎么用最短路径进入？</div>
+    </div>
+    <div class="pillar-body">
+      <h4>设计原则</h4>
+      <ul>
+        <li>看的时候不需要知道"这能改"——展示态干净</li>
+        <li>想改时门槛极低——一键 / 右键 / 一句话</li>
+        <li>入口允许百花齐放，落点必须收敛唯一</li>
+      </ul>
+
+      <h4>4 条召唤通道并列，进去之后世界统一</h4>
+      <div class="summon-grid">
+        <div class="summon-item">
+          <div class="ic">🔘</div>
+          <div class="ttl">顶栏切模式</div>
+        </div>
+        <div class="summon-item">
+          <div class="ic">🎯</div>
+          <div class="ttl">右键"改这里"</div>
+        </div>
+        <div class="summon-item">
+          <div class="ic">💬</div>
+          <div class="ttl">AI 侧栏对话</div>
+        </div>
+        <div class="summon-item">
+          <div class="ic">🧩</div>
+          <div class="ttl">装 skill 插件</div>
+        </div>
+      </div>
+      <div class="summon-arrow">↓</div>
+      <div class="summon-dest">统一落到一个"我改的"副本</div>
+
+      <div class="pillar-reason">
+        <b>这个环节不能省的理由：</b>入口不简单，编辑态再多能力都用不到；入口分散到不同副本上，用户会迷失。
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 环节 ③ ========== -->
+<section class="soft">
+  <div class="pillar-detail">
+    <div class="pillar-side">
+      <div class="num">03</div>
+      <div class="name">编辑能力</div>
+      <div class="conclusion">把 AI 框成 4 层抽屉。<br/>模型变强自动解锁，<br/>下线手改照样 work。</div>
+      <div class="q"><b>这个环节回答：</b>编辑态里，用户能做什么？</div>
+    </div>
+    <div class="pillar-body">
+      <h4>4 层抽屉，下层永远不依赖上层</h4>
+      <div class="layer-stack">
+        <div class="layer-row">
+          <span class="layer-tag">L1</span>
+          <span class="layer-name">无 AI 手改</span>
+          <span class="layer-desc">contentEditable / 拖拽 / 改文字 / 换图</span>
+          <span class="layer-ai">任何时代都 work</span>
+        </div>
+        <div class="layer-row l2">
+          <span class="layer-tag">L2</span>
+          <span class="layer-name">简单 AI 辅助</span>
+          <span class="layer-desc">"优化这段话""换个配色"</span>
+          <span class="layer-ai">模型弱也能干</span>
+        </div>
+        <div class="layer-row l3">
+          <span class="layer-tag">L3</span>
+          <span class="layer-name">高阶 AI 改造</span>
+          <span class="layer-desc">"按上次那个风格重排""表格→信息图"</span>
+          <span class="layer-ai">模型强起来才好用</span>
+        </div>
+        <div class="layer-row l4">
+          <span class="layer-tag">L4</span>
+          <span class="layer-name">Agent 自主改</span>
+          <span class="layer-desc">"帮我改到能用的程度"</span>
+          <span class="layer-ai">未来自动解锁</span>
+        </div>
+      </div>
+
+      <div class="pillar-reason">
+        <b>这个环节的意义：</b>把 AI 严格框在抽屉里。模型变强，上层自然解锁；模型下线，下层依然 work——这是 AI PPT 教训的直接吸收，框架不为模型变化买单。
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 环节 ④ ========== -->
+<section>
+  <div class="pillar-detail">
+    <div class="pillar-side">
+      <div class="num">04</div>
+      <div class="name">副本与去向</div>
+      <div class="conclusion">用户只看到两态：<br/>原版 / 我改的。<br/>fork、版本、合并对用户隐形。</div>
+      <div class="q"><b>这个环节回答：</b>编辑动一下之后，结果去哪？</div>
+    </div>
+    <div class="pillar-body">
+      <h4>第一次编辑动作，自动分叉成"我改的"副本</h4>
+      <div class="state-grid">
+        <div class="state-card origin">
+          <div class="state-name"><span class="dot"></span>原版</div>
+          <div class="state-desc">URL 不变、只读、可一键回到。<br/>用户心里清楚："这是我看到的那个网页"。</div>
+        </div>
+        <div class="state-card edit">
+          <div class="state-name"><span class="dot"></span>我改的</div>
+          <div class="state-desc">独立存在、版本历史默认开。<br/>第一次编辑动作触发分叉（类 Figma 的"小圆点已修改"）。</div>
+        </div>
+      </div>
+
+      <div class="pillar-reason" style="background:#EAF2FF; border-left-color: var(--qb-blue);">
+        <b style="color:var(--qb-blue);">底层细节对用户隐形：</b>fork、commit、版本管理、合规归属——这些是后端工程师的事。用户只感知"原版 / 我改的"两态。
+      </div>
+
+      <h4 class="mt-24">"我改的"6 条去向，每条都通向上下文飞轮</h4>
+      <div class="dest-grid">
+        <div class="dest-item">
+          <div class="ic">💾</div>
+          <div class="ttl">存</div>
+          <div class="hint">默认入收藏 / 历史</div>
+        </div>
+        <div class="dest-item">
+          <div class="ic">🔗</div>
+          <div class="ttl">分享</div>
+          <div class="hint">只读链接</div>
+        </div>
+        <div class="dest-item">
+          <div class="ic">📤</div>
+          <div class="ttl">导出</div>
+          <div class="hint">PDF / HTML / 图</div>
+        </div>
+        <div class="dest-item future">
+          <div class="ic">🌐</div>
+          <div class="ttl">发布</div>
+          <div class="hint">作为新 URL 对外</div>
+        </div>
+        <div class="dest-item future">
+          <div class="ic">🔁</div>
+          <div class="ttl">喂回 AI</div>
+          <div class="hint">下次的 reference</div>
+        </div>
+        <div class="dest-item future">
+          <div class="ic">✨</div>
+          <div class="ttl">收模板</div>
+          <div class="hint">沉淀为 skill</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 环节 ⑤ · 飞轮 ========== -->
+<section class="soft">
+  <div class="pillar-detail">
+    <div class="pillar-side">
+      <div class="num">05</div>
+      <div class="name">上下文引擎</div>
+      <div class="conclusion">每次编辑让"AI 懂你"<br/>变厚一层——<br/>这是浏览器的护城河。</div>
+      <div class="q"><b>这个环节回答：</b>用得越多，产品会不会越来越懂我？</div>
+    </div>
+    <div class="pillar-body">
+      <h4>4 个时刻在沉淀上下文——对用户隐形，对 AI 显形</h4>
+      <ul>
+        <li><b>展示时</b>　AI 看过你的历史和收藏，给你的摘要和别人不一样</li>
+        <li><b>召唤时</b>　AI 带着偏好进编辑态，不用从零 prompt</li>
+        <li><b>编辑时</b>　你可以说"按我上次那个风格"，AI 能调到</li>
+        <li><b>改完后</b>　动作和产物回流，下次 AI 更准</li>
+      </ul>
+
+      <h4 class="mt-24">飞轮里二次编辑不是终点，是上下文"变厚"的关键一环</h4>
+      <div class="flywheel">
+        <svg viewBox="0 0 960 320" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arr3" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L9,3 z" fill="#0052D9"/>
+            </marker>
+          </defs>
+          <g font-family="PingFang SC" font-size="14" fill="#1D2129" text-anchor="middle">
+            <!-- 5 stage -->
+            <g>
+              <circle cx="100" cy="160" r="58" fill="#EAF2FF" stroke="#0052D9" stroke-width="2"/>
+              <text x="100" y="156" font-weight="700" fill="#0052D9">看</text>
+              <text x="100" y="178" font-size="11" fill="#4E5969">浏览网页</text>
+            </g>
+            <g>
+              <circle cx="290" cy="90" r="58" fill="#EAF2FF" stroke="#0052D9" stroke-width="2"/>
+              <text x="290" y="86" font-weight="700" fill="#0052D9">抽取</text>
+              <text x="290" y="108" font-size="11" fill="#4E5969">上下文产出</text>
+            </g>
+            <g>
+              <circle cx="480" cy="160" r="58" fill="#EAF2FF" stroke="#0052D9" stroke-width="2"/>
+              <text x="480" y="156" font-weight="700" fill="#0052D9">创作</text>
+              <text x="480" y="178" font-size="11" fill="#4E5969">消耗上下文</text>
+            </g>
+            <g>
+              <circle cx="670" cy="90" r="60" fill="#FFD666" stroke="#FF7D00" stroke-width="2.5"/>
+              <text x="670" y="86" font-weight="700" fill="#7A4A00">二次编辑</text>
+              <text x="670" y="108" font-size="11" fill="#7A4A00">★ 上下文反哺</text>
+            </g>
+            <g>
+              <circle cx="860" cy="160" r="58" fill="#EAF2FF" stroke="#0052D9" stroke-width="2"/>
+              <text x="860" y="156" font-weight="700" fill="#0052D9">副本入库</text>
+              <text x="860" y="178" font-size="11" fill="#4E5969">新上下文</text>
+            </g>
+          </g>
+          <!-- arrows 连线 -->
+          <g stroke="#0052D9" stroke-width="2" fill="none">
+            <path d="M158,160 C200,160 210,115 232,100" marker-end="url(#arr3)"/>
+            <path d="M348,90  C395,90 395,140 422,155" marker-end="url(#arr3)"/>
+            <path d="M538,160 C580,160 595,115 612,100" marker-end="url(#arr3)"/>
+            <path d="M730,90  C780,90 780,140 802,155" marker-end="url(#arr3)"/>
+            <!-- 回到"看" -->
+            <path d="M860,218 C860,290 100,290 100,218" stroke-dasharray="5 5" marker-end="url(#arr3)"/>
+          </g>
+          <text x="480" y="310" text-anchor="middle" font-size="13" fill="#4E5969" font-family="PingFang SC">闭环形成 · 上下文越转越厚 · AI 越用越懂你</text>
+        </svg>
+      </div>
+
+      <div class="pillar-reason">
+        <b>这就是相对 Lovart 真正的护城河：</b>Lovart 的画板是孤岛，改完即忘。浏览器有"记忆"——每一次改稿，都让 AI 对你这个人更懂一点。下次开始就比上次快一步。
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 一期闭环 ========== -->
+<section>
+  <div class="sec-head">
+    <span class="sec-num">3　PHASE-1</span>
+    <h2 class="sec-title">一期先跑通 HTML 汇报文档闭环——证明5 个环节能合起来 work</h2>
+    <p class="sec-sub">目标不是证明某个能力多炫，是证明这套框架能闭环。HTML 是最适合先跑的载体——已有 publisher 验证、覆盖 5 大场景中 4 个、对齐行业方向。</p>
+  </div>
+
+  <div class="phase-grid">
+    <div class="phase-main">
+      <span class="phase-badge">推荐闭环 · A</span>
+      <h3 class="phase-title">HTML 汇报文档</h3>
+      <p class="phase-reason">
+        Owner 手搓 publisher 已跑通；覆盖 5 大场景 4 个；行业载体升级方向。
+      </p>
+      <div class="phase-pillars">
+        <div class="phase-pillar-row">
+          <span class="phase-pillar-tag">环节 ①</span>
+          <span class="phase-pillar-desc">HTML 默认展示（已具备）</span>
+        </div>
+        <div class="phase-pillar-row">
+          <span class="phase-pillar-tag">环节 ②</span>
+          <span class="phase-pillar-desc">顶栏"改" + 右键改</span>
+        </div>
+        <div class="phase-pillar-row">
+          <span class="phase-pillar-tag">环节 ③</span>
+          <span class="phase-pillar-desc">L1 手改 + L2 简单 AI 辅助</span>
+        </div>
+        <div class="phase-pillar-row">
+          <span class="phase-pillar-tag">环节 ④</span>
+          <span class="phase-pillar-desc">本地副本 + 只读分享链接</span>
+        </div>
+        <div class="phase-pillar-row">
+          <span class="phase-pillar-tag">环节 ⑤</span>
+          <span class="phase-pillar-desc">打通收藏/历史</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase-alt">
+      <h4>备选 · 后续专项</h4>
+      <div class="alt-item">
+        <div class="n">B · PDF / 长文</div>
+        <div class="d">学生 / 股民 / 办事党。批注、摘段、重排为主。</div>
+      </div>
+      <div class="alt-item">
+        <div class="n">C · 抽取产物</div>
+        <div class="d">和抽取最短对接。一期提前占位。</div>
+      </div>
+      <div class="alt-item">
+        <div class="n">非 HTML 格式</div>
+        <div class="d">一期只在 HTML 做完整闭环，其他先做"能展示"。</div>
+      </div>
+      <div class="alt-item">
+        <div class="n">移动端</div>
+        <div class="d">一期不做，但框架预留端适配。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 资源清单 ========== -->
+<section class="soft">
+  <div class="sec-head">
+    <span class="sec-num">4　RESOURCES</span>
+    <h2 class="sec-title">方案我来定，这 7 项资源需要协调到位</h2>
+    <p class="sec-sub">按环节归属列出，缺哪项哪根环节立不起来。</p>
+  </div>
+
+  <table class="res-table">
+    <thead>
+      <tr>
+        <th style="width: 28%;">资源</th>
+        <th style="width: 52%;">用途</th>
+        <th style="width: 20%;">对应环节</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="res-icon">▸</span>副本云端存储</td>
+        <td>"我改的"持久化、跨设备、分享链接承载</td>
+        <td>环节 ④</td>
+      </tr>
+      <tr>
+        <td><span class="res-icon">▸</span>版本历史存储</td>
+        <td>时间轴、回溯、未来协同基础</td>
+        <td>环节 ④</td>
+      </tr>
+      <tr>
+        <td><span class="res-icon">▸</span>上下文引擎接口</td>
+        <td>读取用户历史 / 收藏 / 偏好，喂给编辑态的 AI</td>
+        <td>环节 ⑤</td>
+      </tr>
+      <tr>
+        <td><span class="res-icon">▸</span>抽取产物接口</td>
+        <td>接收上游 6 类抽取结构化结果（正文/字段/楼层/文档/图/视频）</td>
+        <td>环节 ①</td>
+      </tr>
+      <tr>
+        <td><span class="res-icon">▸</span>Skill 沉淀通道</td>
+        <td>把用户的编辑动作沉淀为可复用 skill</td>
+        <td>环节 ⑤</td>
+      </tr>
+      <tr>
+        <td><span class="res-icon">▸</span>登录账号体系</td>
+        <td>副本归属与用户身份绑定（UnionID）</td>
+        <td>环节 ④ / ⑤</td>
+      </tr>
+      <tr>
+        <td><span class="res-icon">▸</span>合规审查</td>
+        <td>二创场景的版权 / 内容合规边界</td>
+        <td>环节 ④</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ========== 自检 ========== -->
+<section>
+  <div class="sec-head">
+    <span class="sec-num">5　SELF-CHECK</span>
+    <h2 class="sec-title">用 4 个极端假设压一遍，方案都立得住</h2>
+    <p class="sec-sub">AI 升级 10 倍、AI 下线、抽取同学对接、汉博转述给别人——四种情况下，这套方案都不该垮。</p>
+  </div>
+
+  <div class="check-grid">
+    <div class="check-card">
+      <div class="check-q">Q · 如果 AI 模型明天升级 10 倍</div>
+      <div class="check-a"><em>几乎不用改。</em>AI 强了，环节 ③ 的抽屉里就多几把好工具。</div>
+    </div>
+    <div class="check-card">
+      <div class="check-q">Q · 如果 AI 模型明天下线</div>
+      <div class="check-a">环节 ① / 2 / 4 / 5 <em>完全 work</em>。环节 ③ 退回纯手改也 work。</div>
+    </div>
+    <div class="check-card">
+      <div class="check-q">Q · 能和抽取同学的规划形成对偶结构吗</div>
+      <div class="check-a"><em>可以。</em>抽取同学做"进来"，我做"出去"。接口：6 类产物 → 我的展示模板。</div>
+    </div>
+    <div class="check-card">
+      <div class="check-q">Q · 汉博 5 分钟能不能讲清楚给别人</div>
+      <div class="check-a">应该可以——<em>5 环节一张图 + 一期一条闭环</em>。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== footer ========== -->
+<footer>
+  <div class="f-row">
+    <div>
+      <b>浏览器 AI · 看改一体工作台</b>　|　二次编辑专项规划稿 v1
+    </div>
+    <div>
+      Owner · 黎明睿　　呈报 · 汉博　　2026-05-12
+    </div>
+  </div>
+</footer>
+
+</div>
+<!-- 评论 + 导出 脚本 -->
+<div class="cmt-toast" id="cmtToast"></div>
+<button class="cmt-export" id="cmtExport" style="display:none;">
+  <span>📋 导出评论</span>
+  <span class="badge" id="cmtBadge">0</span>
+</button>
+
+<script>
+(function(){
+  var STORAGE_KEY = 'qb-second-edit-plan.comments.v1';
+  var TITLE = document.title || '汇报稿';
+
+  // ---------- 存取 ----------
+  function load(){ try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch(e) { return {}; } }
+  function save(data){ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+  function uid(){ return 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+  function now(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
+
+  // ---------- Toast ----------
+  function toast(msg){
+    var t = document.getElementById('cmtToast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function(){ t.classList.remove('show'); }, 1800);
+  }
+
+  // ---------- 章节标识 ----------
+  // 每个 section 需要一个稳定 key：优先用 sec-num，兜底用序号
+  function getSectionKey(sec, idx){
+    var num = sec.querySelector('.sec-num');
+    if (num) return num.textContent.trim().split(/\s+/)[0]; // 如 "0.1"
+    // 封面 / 其他
+    if (sec.classList.contains('cover')) return 'cover';
+    var ph = sec.querySelector('.phase-badge');
+    if (ph) return 'phase1';
+    return 'sec' + idx;
+  }
+  function getSectionTitle(sec){
+    var h = sec.querySelector('.sec-title, h1, .phase-title');
+    return h ? h.textContent.trim() : '（未命名）';
+  }
+
+  // ---------- 构建评论 UI ----------
+  var data = load();
+  var sections = document.querySelectorAll('section');
+
+  sections.forEach(function(sec, idx){
+    var key = getSectionKey(sec, idx);
+    sec.dataset.cmtKey = key;
+
+    // 评论按钮
+    var btn = document.createElement('button');
+    btn.className = 'cmt-btn';
+    btn.innerHTML = '💬';
+    btn.title = '对本节评论';
+    sec.appendChild(btn);
+
+    // 评论面板
+    var panel = document.createElement('div');
+    panel.className = 'cmt-panel';
+    panel.innerHTML =
+      '<h5>对本节的评论</h5>' +
+      '<div class="cmt-list"></div>' +
+      '<textarea class="cmt-input" placeholder="写下你的意见，Ctrl/⌘+Enter 保存"></textarea>' +
+      '<div class="cmt-actions"><span class="cmt-hint">Ctrl/⌘+Enter 保存</span><button class="cmt-save">保存</button></div>';
+    sec.appendChild(panel);
+
+    // 渲染列表
+    function render(){
+      var list = (data[key] && data[key].items) || [];
+      var $list = panel.querySelector('.cmt-list');
+      $list.innerHTML = '';
+      list.forEach(function(item){
+        var el = document.createElement('div');
+        el.className = 'cmt-item';
+        el.innerHTML = '<span class="cmt-time">' + item.time + '</span>' +
+          escapeHtml(item.text).replace(/\n/g, '<br>') +
+          '<span class="cmt-del" data-id="' + item.id + '" title="删除">✕</span>';
+        $list.appendChild(el);
+      });
+      // 更新按钮状态
+      if (list.length > 0){
+        btn.classList.add('has-comment');
+        btn.innerHTML = '💬<span class="dot">' + list.length + '</span>';
+      } else {
+        btn.classList.remove('has-comment');
+        btn.innerHTML = '💬';
+      }
+      updateBadge();
+    }
+
+    // 保存
+    function saveComment(){
+      var $ta = panel.querySelector('.cmt-input');
+      var text = $ta.value.trim();
+      if (!text) { $ta.focus(); return; }
+      if (!data[key]) data[key] = { title: getSectionTitle(sec), items: [] };
+      data[key].title = getSectionTitle(sec); // 每次保存时更新标题
+      data[key].items.push({ id: uid(), text: text, time: now() });
+      save(data);
+      $ta.value = '';
+      render();
+      toast('已保存');
+    }
+
+    // 展开 / 收起
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      // 关闭其他面板
+      document.querySelectorAll('.cmt-panel.open').forEach(function(p){ if (p!==panel) p.classList.remove('open'); });
+      panel.classList.toggle('open');
+      if (panel.classList.contains('open')){
+        setTimeout(function(){ panel.querySelector('.cmt-input').focus(); }, 50);
+      }
+    });
+
+    panel.addEventListener('click', function(e){ e.stopPropagation(); });
+
+    panel.querySelector('.cmt-save').addEventListener('click', saveComment);
+    panel.querySelector('.cmt-input').addEventListener('keydown', function(e){
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter'){ e.preventDefault(); saveComment(); }
+    });
+
+    // 删除
+    panel.querySelector('.cmt-list').addEventListener('click', function(e){
+      var del = e.target.closest('.cmt-del');
+      if (!del) return;
+      var id = del.dataset.id;
+      if (!data[key]) return;
+      data[key].items = data[key].items.filter(function(x){ return x.id !== id; });
+      save(data);
+      render();
+      toast('已删除');
+    });
+
+    render();
+  });
+
+  // 点空白处关面板
+  document.addEventListener('click', function(){
+    document.querySelectorAll('.cmt-panel.open').forEach(function(p){ p.classList.remove('open'); });
+  });
+
+  // ---------- 导出 ----------
+  function updateBadge(){
+    var total = 0;
+    Object.keys(data).forEach(function(k){ total += (data[k].items || []).length; });
+    var exp = document.getElementById('cmtExport');
+    var badge = document.getElementById('cmtBadge');
+    badge.textContent = total;
+    exp.style.display = total > 0 ? 'flex' : 'none';
+  }
+
+  function buildMarkdown(){
+    var d = load();
+    var keys = Object.keys(d).filter(function(k){ return (d[k].items||[]).length > 0; });
+    if (!keys.length) return '（暂无评论）';
+    var lines = [];
+    lines.push('# ' + TITLE + ' — 评论汇总');
+    lines.push('');
+    lines.push('导出时间：' + now());
+    lines.push('');
+    // 按 key 排序：0.1 / 0.2 / 0.3 / 2 / 3 / 4 / 5 / cover / ...
+    keys.sort(function(a,b){
+      var na = parseFloat(a), nb = parseFloat(b);
+      if (!isNaN(na) && !isNaN(nb)) return na - nb;
+      if (!isNaN(na)) return -1;
+      if (!isNaN(nb)) return 1;
+      return a.localeCompare(b);
+    });
+    keys.forEach(function(k){
+      var s = d[k];
+      lines.push('## [' + k + '] ' + (s.title || ''));
+      lines.push('');
+      s.items.forEach(function(item, i){
+        lines.push('- **' + (i+1) + '. ' + item.time + '**');
+        item.text.split('\n').forEach(function(line){ lines.push('  ' + line); });
+      });
+      lines.push('');
+    });
+    return lines.join('\n');
+  }
+
+  function exportComments(){
+    var md = buildMarkdown();
+    // 复制到剪贴板
+    var ok = false;
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = md;
+      ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+    } catch(e){}
+    // 下载 .md 文件
+    try {
+      var blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = '评论_' + new Date().toISOString().slice(0,19).replace(/[:T]/g,'-') + '.md';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    } catch(e){}
+    toast(ok ? '已复制到剪贴板 · 同时下载 .md 文件' : '已下载 .md 文件');
+  }
+
+  document.getElementById('cmtExport').addEventListener('click', exportComments);
+
+  function escapeHtml(s){ return s.replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; }); }
+
+  updateBadge();
+})();
+</script>
+
+</body>
+</html>
