@@ -2,8 +2,8 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <!-- mobile-readability-v4 build:20260512-203500 fix-flex-shrink-collapse -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- mobile-readability-v5 build:20260512-205200 quick-input-bubble -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -628,6 +628,72 @@
         }
         /* 当卡片打开时，给页面留 footer 空间 */
         body.mobile-view.mobile-card-open .container { padding-bottom: calc(var(--vh, 1vh) * 70); }
+
+        /* ============ v5：手机视图快速评论气泡 ============ */
+        #mobileQuickInput {
+            position: absolute; z-index: 10001;
+            display: none;
+            background: #fff; border: 1px solid #e5e7eb; border-radius: 12px;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);
+            padding: 10px 12px 12px;
+            font-size: 14px; color: #1f2937;
+        }
+        #mobileQuickInput.show { display: block; animation: mqi-pop .18s ease-out; }
+        @keyframes mqi-pop {
+            from { opacity: 0; transform: translateY(-4px) scale(.96); }
+            to   { opacity: 1; transform: translateY(0)    scale(1);  }
+        }
+        #mobileQuickInput .mqi-arrow {
+            position: absolute; top: -7px; left: 16px;
+            width: 14px; height: 14px; background: #fff;
+            border-left: 1px solid #e5e7eb; border-top: 1px solid #e5e7eb;
+            transform: rotate(45deg);
+        }
+        #mobileQuickInput.above .mqi-arrow {
+            top: auto; bottom: -7px; transform: rotate(-135deg);
+        }
+        #mobileQuickInput .mqi-head {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 8px;
+        }
+        #mobileQuickInput .mqi-title {
+            font-size: 13px; font-weight: 600; color: #4b5563;
+        }
+        #mobileQuickInput .mqi-close {
+            width: 26px; height: 26px; border: none; background: #f3f4f6;
+            border-radius: 50%; color: #6b7280; font-size: 14px; cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center; padding: 0;
+        }
+        #mobileQuickInput textarea {
+            width: 100%; box-sizing: border-box;
+            min-height: 72px; max-height: 160px;
+            padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 8px;
+            font-size: 16px; /* 必须 ≥16px 防止 iOS 自动缩放 */
+            line-height: 1.6; color: #111827;
+            font-family: inherit; resize: vertical; outline: none;
+            background: #fafafa;
+        }
+        #mobileQuickInput textarea:focus { border-color: #667eea; background: #fff; }
+        #mobileQuickInput .mqi-foot {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 10px;
+        }
+        #mobileQuickInput .mqi-tip { font-size: 11px; color: #9ca3af; }
+        #mobileQuickInput .mqi-send {
+            border: none; background: #667eea; color: #fff;
+            padding: 8px 18px; border-radius: 18px;
+            font-size: 14px; font-weight: 600; cursor: pointer;
+        }
+        #mobileQuickInput .mqi-send:disabled { opacity: 0.5; cursor: not-allowed; }
+        /* 被选中元素：蓝色 outline */
+        .mqi-target-active {
+            outline: 2px solid #667eea !important; outline-offset: 2px;
+            background: rgba(102,126,234,0.08) !important;
+            border-radius: 4px;
+            transition: outline-color .2s, background .2s;
+        }
+        /* v5：手机视图下旧的底部抽屉评论卡彻底隐藏 */
+        body.mobile-view #mobileCommentCard { display: none !important; }
     
 /* ========== 02 source styles ========== */
 
@@ -2160,7 +2226,7 @@
         const WORKER_BASE = 'https://1406195631-ft345q04pn.ap-guangzhou.tencentscf.com';
 
         // 仅 AI 改稿密钥（deepseek API key）保留密码加密存储——deepseek key 暴露不会被自动 revoke
-        const ENCRYPTED_KEYS = 'Rgu5GDmqq8yX99IFRMhjoTYLSb75QftmNvMz1y7QjVCn171mx+qumHYYChmObydvRLlfolXWNqxuDTGkB7g75O4NERdlmy+LHt2SJWB+rJd0nSeDHho=';
+        const ENCRYPTED_KEYS = '6kx8FS5+IRDTElsj6g7/9J9F+T+v9775gRjzznwdMXeqAWwH3Y23Xzvt0/29F/2C1Gt9qVrgnLWOaEg5bYwhr+Fqm3eqmJqNfhF71rOqsNUoBA3UufI=';
 
         let _cachedKeys = null;
         async function ensureKeys() {
@@ -3169,8 +3235,76 @@
         // ===================================================================
         let mobileCardTarget = null; // 当前卡片绑定的 target 元素
 
+        // === v5：手机视图改为"点哪儿在哪儿下方出小输入框"（不再底部抽屉、不再展示评论列表）===
+        function _ensureMobileQuickInputDOM() {
+            let qi = document.getElementById('mobileQuickInput');
+            if (qi) return qi;
+            qi = document.createElement('div');
+            qi.id = 'mobileQuickInput';
+            qi.innerHTML = `
+                <div class="mqi-arrow"></div>
+                <div class="mqi-head">
+                    <span class="mqi-title" id="mqiTitle">写评论</span>
+                    <button type="button" class="mqi-close" aria-label="关闭">✕</button>
+                </div>
+                <textarea id="mqiInput" placeholder="说点什么…" rows="3"></textarea>
+                <div class="mqi-foot">
+                    <span class="mqi-tip">仅老板能看到</span>
+                    <button type="button" class="mqi-send" id="mqiSend">发送</button>
+                </div>
+            `;
+            document.body.appendChild(qi);
+            // 绑定关闭
+            qi.querySelector('.mqi-close').addEventListener('click', (e) => {
+                e.preventDefault(); e.stopPropagation();
+                hideMobileCommentCard();
+            });
+            // 绑定发送（不用 inline onclick，避免被某些 webview 拦截）
+            qi.querySelector('#mqiSend').addEventListener('click', (e) => {
+                e.preventDefault(); e.stopPropagation();
+                submitMobileComment(false);
+            });
+            // 阻止冒泡到 document 触发关闭
+            qi.addEventListener('click', (e) => e.stopPropagation());
+            return qi;
+        }
+
+        function _positionMobileQuickInput(targetEl) {
+            const qi = document.getElementById('mobileQuickInput');
+            if (!qi) return;
+            const rect = targetEl.getBoundingClientRect();
+            const vw = window.innerWidth;
+            const padding = 12;
+            const qiWidth = Math.min(vw - padding * 2, 360);
+            qi.style.width = qiWidth + 'px';
+            // 让左边对齐元素中点
+            let left = rect.left + rect.width / 2 - qiWidth / 2;
+            if (left < padding) left = padding;
+            if (left + qiWidth > vw - padding) left = vw - padding - qiWidth;
+            // 上下：默认放在元素下面；如果空间不够就放上面
+            const below = rect.bottom + 10;
+            const vh = window.innerHeight;
+            let top = below;
+            const estimatedHeight = 220;
+            if (top + estimatedHeight > vh - 20 && rect.top - estimatedHeight - 10 > 10) {
+                top = rect.top - estimatedHeight - 10;
+                qi.classList.add('above');
+            } else {
+                qi.classList.remove('above');
+            }
+            // absolute 用页面坐标
+            qi.style.left = left + 'px';
+            qi.style.top = (top + window.scrollY) + 'px';
+            // 箭头位置（指向元素中心）
+            const arrow = qi.querySelector('.mqi-arrow');
+            if (arrow) {
+                const targetCenterX = rect.left + rect.width / 2;
+                arrow.style.left = (targetCenterX - left - 8) + 'px';
+            }
+        }
+
         async function openMobileCommentCard(targetEl) {
-            // v2.11.27：手机端互斥——开底部卡片前关掉侧边面板，避免重叠
+            // 关闭 PC 侧边面板（手机互斥）
             if (typeof closePanel === 'function') {
                 const panelEl = document.getElementById('commentPanel');
                 if (panelEl && panelEl.classList.contains('open')) closePanel();
@@ -3179,96 +3313,78 @@
             const tid = targetEl.dataset.targetId;
             const sectionEl = targetEl.closest('.commentable[data-section]');
             const section = sectionEl ? sectionEl.dataset.section : null;
-            // 设置 currentScope 为 target，让 addComment 复用
+            // 让 addComment 复用 target scope
             currentScope = { kind: 'target', id: tid };
             currentSection = section;
             currentTarget = tid;
             currentMultiItems = null;
-            // 标题
-            document.getElementById('mccTitle').textContent = getTargetLabel(targetEl);
-            // 渲染评论 list
-            await renderMobileCardList();
-            // 清空输入
-            document.getElementById('mccInput').value = '';
-            // 显示
-            const card = document.getElementById('mobileCommentCard');
-            card.classList.add('show');
-            document.body.classList.add('mobile-card-open');
-            setTimeout(() => document.getElementById('mccInput').focus(), 300);
+
+            // 视觉标记被选中元素
+            document.querySelectorAll('.mqi-target-active').forEach(el => el.classList.remove('mqi-target-active'));
+            targetEl.classList.add('mqi-target-active');
+
+            const qi = _ensureMobileQuickInputDOM();
+            qi.querySelector('#mqiInput').value = '';
+            qi.classList.add('show');
+            _positionMobileQuickInput(targetEl);
+
+            // 滚动元素进入合适位置（避免被键盘/输入框遮住）
+            setTimeout(() => {
+                try { targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch(_) {}
+                setTimeout(() => _positionMobileQuickInput(targetEl), 350);
+            }, 50);
+
+            // 聚焦（延迟，等过渡完成）
+            setTimeout(() => {
+                const ta = qi.querySelector('#mqiInput');
+                if (ta) ta.focus();
+            }, 380);
         }
 
         function hideMobileCommentCard() {
-            const card = document.getElementById('mobileCommentCard');
-            if (!card) return;
-            card.classList.remove('show');
-            document.body.classList.remove('mobile-card-open');
+            const qi = document.getElementById('mobileQuickInput');
+            if (qi) qi.classList.remove('show');
+            document.querySelectorAll('.mqi-target-active').forEach(el => el.classList.remove('mqi-target-active'));
             mobileCardTarget = null;
         }
 
-        async function renderMobileCardList() {
-            if (!mobileCardTarget) return;
-            const tid = mobileCardTarget.dataset.targetId;
-            const list = document.getElementById('mccList');
-            const all = await loadAllComments();
-            // 过滤：targetId 匹配，或 targets 数组里包含
-            const filtered = all.filter(c => {
-                if (c.targetId === tid) return true;
-                if (Array.isArray(c.targets) && c.targets.some(t => t.targetId === tid)) return true;
-                return false;
-            });
-            if (filtered.length === 0) {
-                list.innerHTML = `<div class="mcc-empty">暂无评论，写下第一条吧</div>`;
-                return;
-            }
-            list.innerHTML = filtered.map(c => {
-                const isAI = c.type === 'ai_executed';
-                const isPending = c.type === 'ai_pending';
-                const isFailed = c.type === 'ai_failed';
-                const cls = isAI ? 'ai' : '';
-                const badge = isAI ? `<span class="mcc-badge">⚡ AI v${c.version || '?'}</span>`
-                    : isPending ? `<span class="mcc-badge" style="background:#f59e0b;color:white;">AI 执行中</span>`
-                    : isFailed ? `<span class="mcc-badge" style="background:#ff4d4f;color:white;">AI 失败</span>` : '';
-                const text = (c.text || '').replace(/</g, '&lt;');
-                const aiResp = c.aiResponse ? `<div style="margin-top:6px;padding:6px 8px;background:#f0f7ff;border-radius:5px;font-size:11px;color:#555;">${(c.aiResponse || '').replace(/</g, '&lt;')}</div>` : '';
-                return `<div class="mcc-item ${cls}">
-                    <div>${text}${badge}</div>
-                    ${aiResp}
-                    <div class="mcc-meta"><span>${c.author || '匿名'}</span><span>${c.time || ''}</span></div>
-                </div>`;
-            }).join('');
-            // 自动滚到底
-            list.scrollTop = list.scrollHeight;
-        }
+        // 兼容兜底：旧 mobileCommentCard 节点仍然在 DOM 里，但永远不再 show
+        // 旧的 renderMobileCardList 改为空操作（避免被其他地方意外调用报错）
+        async function renderMobileCardList() { /* deprecated in v5 */ }
+
 
         async function submitMobileComment(useAI) {
-            const ta = document.getElementById('mccInput');
-            const text = (ta.value || '').trim();
+            // v5：优先读新的 quick input；如果不存在再回退到旧的 mccInput（兼容）
+            let ta = document.getElementById('mqiInput');
+            if (!ta) ta = document.getElementById('mccInput');
+            const text = ((ta && ta.value) || '').trim();
             if (!text) return;
             if (!mobileCardTarget) return;
             // 灌进 commentInput 复用 addComment
             const ci = document.getElementById('commentInput');
-            ci.value = text;
-            // 锁按钮
-            const cBtn = document.getElementById('mccBtnComment');
-            const aBtn = document.getElementById('mccBtnAI');
-            cBtn.disabled = true; aBtn.disabled = true;
-            const origCText = cBtn.textContent;
-            const origAText = aBtn.textContent;
-            if (useAI) {
-                aBtn.textContent = 'AI 执行中...';
-                showTopToast('AI 修改指令已发送，请稍等');
-            } else {
-                cBtn.textContent = '发送中...';
+            if (ci) ci.value = text;
+            // 锁按钮（兼容新/旧两种 DOM）
+            const sendBtn = document.getElementById('mqiSend') || document.getElementById('mccBtnComment');
+            const origText = sendBtn ? sendBtn.textContent : '';
+            if (sendBtn) {
+                sendBtn.disabled = true;
+                sendBtn.textContent = '发送中...';
             }
             try {
-                await addComment(useAI);
-                ta.value = '';
-                // 刷新 list
-                await renderMobileCardList();
+                await addComment(false); // 手机版不开 AI
+                if (ta) ta.value = '';
+                // v5：发送成功直接关闭 + 提示
+                hideMobileCommentCard();
+                if (typeof showTopToast === 'function') showTopToast('✓ 评论已发送', 1800);
+            } catch (err) {
+                console.error('[mobile send]', err);
+                if (typeof showTopToast === 'function') showTopToast('发送失败：' + (err && err.message || err), 3000);
+                else alert('发送失败：' + (err && err.message || err));
             } finally {
-                cBtn.disabled = false; aBtn.disabled = false;
-                cBtn.textContent = origCText;
-                aBtn.textContent = origAText;
+                if (sendBtn) {
+                    sendBtn.disabled = false;
+                    sendBtn.textContent = origText || '发送';
+                }
             }
         }
 
@@ -4006,7 +4122,7 @@
             // v2.12.1：模态弹窗（密码框、昵称框）优先 return，绝不走选区逻辑
             if (e.target.closest('#pwdDialog, #inputDialog')) return;
             // v2.11：浮动小气泡和输入框点击优先 return，绝不走选区逻辑
-            if (e.target.closest('#bubbleToolbar, #bubbleInput, #topToast, #mobileCommentCard')) return;
+            if (e.target.closest('#bubbleToolbar, #bubbleInput, #topToast, #mobileCommentCard, #mobileQuickInput')) return;
             const showComments = document.body.classList.contains('show-comments');
             const isCmd = e.metaKey || e.ctrlKey;
             const inSel = isInSelectionMode();
@@ -4088,7 +4204,7 @@
             // 兜底：批注态 + 隐藏态都管 —— 面板开着且点空白 → 关闭
             // （以防上面分支因为 showComments 切换错过）
             const panelEl = document.getElementById('commentPanel');
-            if (panelEl && panelEl.classList.contains('open') && !e.target.closest('#commentPanel, #globalCommentFab, #versionModal, #helpModal, #bubbleToolbar, #bubbleInput, #topToast, #mobileCommentCard')) {
+            if (panelEl && panelEl.classList.contains('open') && !e.target.closest('#commentPanel, #globalCommentFab, #versionModal, #helpModal, #bubbleToolbar, #bubbleInput, #topToast, #mobileCommentCard, #mobileQuickInput')) {
                 closePanel();
             }
         }, true);
@@ -4197,7 +4313,7 @@
             // v2.12.1：模态弹窗（密码框、昵称框）优先 return
             if (e.target.closest('#pwdDialog, #inputDialog')) return;
             // 点 评论面板 / FAB / 版本modal / 顶部按钮 / commentable 元素 / v2.11 浮层 都不算空白
-            if (e.target.closest('#commentPanel, #globalCommentFab, #versionModal, #toggleCommentVisBtn, #helpBtn, #helpModal, #bubbleToolbar, #bubbleInput, #topToast, #mobileCommentCard')) return;
+            if (e.target.closest('#commentPanel, #globalCommentFab, #versionModal, #toggleCommentVisBtn, #helpBtn, #helpModal, #bubbleToolbar, #bubbleInput, #topToast, #mobileCommentCard, #mobileQuickInput')) return;
             if (e.target.closest('.commentable-text, .commentable-image, .commentable-data')) return;
             // ⌘/Ctrl 点击空白：可能是想框选误触，不退出
             if (e.metaKey || e.ctrlKey) return;
