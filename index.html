@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <!-- mobile-readability-v5.11 build:20260512-232800 resources-rewrite-remove-selfcheck -->
+    <!-- mobile-readability-v5.12 build:20260512-234500 tables-and-zoom -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
@@ -372,6 +372,137 @@
         /* 给所有表格自动包一个滚动容器（fallback：让 table 父级可滚）*/
         body.mobile-view .detail-section { padding: 14px !important; border-radius: 10px !important; overflow-x: auto; }
         body.mobile-view .detail-section h3 { font-size: 14px !important; }
+
+        /* v5.12：能力对比表 & 资源表在手机视图下横向滚动，保持单元格可读宽度 */
+        body.mobile-view .adv-table,
+        body.mobile-view .res-table {
+            display: block;
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 10px;
+        }
+        body.mobile-view .adv-table thead,
+        body.mobile-view .adv-table tbody,
+        body.mobile-view .res-table thead,
+        body.mobile-view .res-table tbody {
+            display: table;
+            width: max-content;
+            min-width: 100%;
+        }
+        body.mobile-view .adv-table { min-width: 640px; }
+        body.mobile-view .res-table { min-width: 560px; }
+        body.mobile-view .adv-table th,
+        body.mobile-view .adv-table td,
+        body.mobile-view .res-table th,
+        body.mobile-view .res-table td {
+            padding: 10px 12px !important;
+            font-size: 13px !important;
+            line-height: 1.5 !important;
+            white-space: normal;
+            word-break: keep-all;
+            overflow-wrap: break-word;
+        }
+        /* 列宽给足 */
+        body.mobile-view .adv-table th:first-child,
+        body.mobile-view .adv-table td:first-child { min-width: 180px; }
+        body.mobile-view .adv-table th:not(:first-child),
+        body.mobile-view .adv-table td:not(:first-child) { min-width: 96px; }
+        body.mobile-view .res-table th:first-child,
+        body.mobile-view .res-table td:first-child { min-width: 130px; }
+        body.mobile-view .res-table th:nth-child(2),
+        body.mobile-view .res-table td:nth-child(2) { min-width: 240px; }
+        body.mobile-view .res-table th:nth-child(3),
+        body.mobile-view .res-table td:nth-child(3) { min-width: 100px; }
+
+        /* v5.12：4 层抽屉 layer-row —— 手机视图改纵向堆叠（PC 保持横向 flex） */
+        body.mobile-view .layer-row {
+            display: grid !important;
+            grid-template-columns: auto 1fr;
+            gap: 6px 10px !important;
+            padding: 12px 14px !important;
+            align-items: start !important;
+        }
+        body.mobile-view .layer-tag {
+            grid-row: 1 / 3; grid-column: 1;
+            align-self: flex-start;
+            min-width: 36px !important; padding: 3px 8px !important;
+        }
+        body.mobile-view .layer-name {
+            grid-row: 1; grid-column: 2;
+            min-width: 0 !important;
+            font-size: 14.5px !important;
+        }
+        body.mobile-view .layer-desc {
+            grid-row: 2; grid-column: 2;
+            font-size: 13px !important; color: var(--ink-2) !important;
+            word-break: break-word; overflow-wrap: anywhere;
+        }
+        body.mobile-view .layer-ai {
+            grid-row: 3; grid-column: 1 / 3;
+            font-size: 12px !important; color: var(--ink-3) !important;
+            margin-top: 2px;
+            padding-top: 6px;
+            border-top: 1px dashed #eef;
+        }
+
+        /* v5.12：可点击放大的图片 —— SVG 容器 + IMG */
+        body.mobile-view .zoomable,
+        body.mobile-view .force-vis,
+        body.mobile-view .pillars-hero,
+        body.mobile-view .flywheel,
+        body.mobile-view .scene-funnel,
+        body.mobile-view img.zoomable {
+            cursor: zoom-in;
+        }
+        body.mobile-view .force-vis::after {
+            content: '🔍 点击放大';
+            display: block;
+            text-align: right;
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 4px;
+            pointer-events: none;
+        }
+        /* 批注模式下隐藏放大提示，避免干扰 */
+        body.mobile-view.show-comments .force-vis::after { content: none; }
+        body.mobile-view.show-comments .force-vis,
+        body.mobile-view.show-comments .pillars-hero,
+        body.mobile-view.show-comments .flywheel,
+        body.mobile-view.show-comments .scene-funnel { cursor: auto; }
+        /* 图片放大遮罩层 */
+        #imgZoomOverlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.92);
+            z-index: 100000;
+            display: none;
+            align-items: center; justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        #imgZoomOverlay.show { display: flex; animation: zoomFade .18s ease-out; }
+        @keyframes zoomFade { from { opacity: 0; } to { opacity: 1; } }
+        #imgZoomOverlay .zoom-canvas {
+            width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            overflow: auto;
+        }
+        #imgZoomOverlay .zoom-canvas > * {
+            max-width: 100%; max-height: 100%;
+            transform-origin: center;
+        }
+        #imgZoomOverlay .zoom-close {
+            position: absolute; top: 16px; right: 16px;
+            width: 40px; height: 40px; border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            border: none; color: white; font-size: 20px;
+            cursor: pointer; z-index: 2;
+        }
+        #imgZoomOverlay .zoom-hint {
+            position: absolute; bottom: 20px; left: 0; right: 0;
+            text-align: center; color: rgba(255,255,255,.6);
+            font-size: 12px; pointer-events: none;
+        }
 
         /* —— 副标题/正文统一行高 —— */
         body.mobile-view p { line-height: 1.75; }
@@ -2173,59 +2304,51 @@
   <div class="sec-head">
     <span class="sec-num">4　RESOURCES</span>
     <h2 class="sec-title">需要协调的 7 项资源</h2>
-    <p class="sec-sub">每项资源对应这个项目的哪个能力、要协调哪边、建议优先级。</p>
+    <p class="sec-sub">每项资源在这个项目里干什么、建议优先级。</p>
   </div>
 
   <table class="res-table">
     <thead>
       <tr>
-        <th style="width: 22%;">资源</th>
-        <th style="width: 38%;">在这个项目里干什么</th>
-        <th style="width: 22%;">对接谁 / 用在哪</th>
-        <th style="width: 18%;">建议优先级</th>
+        <th style="width: 24%;">资源</th>
+        <th style="width: 56%;">在这个项目里干什么</th>
+        <th style="width: 20%;">建议优先级</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td><span class="res-icon">▸</span>抽取产物接口</td>
         <td>把元宝抽取出来的 6 类内容（正文 / 字段 / 楼层 / 文档 / 图 / 视频），按统一结构丢给浏览器渲染</td>
-        <td>抽取同学 · 用于"看"的入口</td>
         <td><span class="res-prio p0">P0 必须</span></td>
       </tr>
       <tr>
         <td><span class="res-icon">▸</span>副本云端存储</td>
         <td>用户改完的版本要存得住、跨设备打开、能生成分享链接</td>
-        <td>云存储团队 · 用于"留得住"</td>
         <td><span class="res-prio p0">P0 必须</span></td>
       </tr>
       <tr>
         <td><span class="res-icon">▸</span>登录 / 账号体系</td>
         <td>知道副本是谁的，跨端登录后能拿回自己的稿子</td>
-        <td>账号 / UnionID · 用于"留得住""带得走"</td>
         <td><span class="res-prio p0">P0 必须</span></td>
       </tr>
       <tr>
         <td><span class="res-icon">▸</span>合规审查</td>
         <td>用户基于 AI 内容二次创作的版权和内容合规边界要划清</td>
-        <td>法务 / 内容安全 · 一期上线前必须有结论</td>
         <td><span class="res-prio p0">P0 必须</span></td>
       </tr>
       <tr>
         <td><span class="res-icon">▸</span>版本历史</td>
         <td>每次改有时间轴，可回退；以后协同的基础</td>
-        <td>云存储团队 · 用于"留得住"</td>
         <td><span class="res-prio p1">P1 一期内</span></td>
       </tr>
       <tr>
         <td><span class="res-icon">▸</span>上下文引擎</td>
         <td>用户的浏览历史 / 收藏 / 偏好喂给编辑里的 AI，让改稿更懂这个人</td>
-        <td>上下文团队 · 用于"AI 帮我改"</td>
         <td><span class="res-prio p2">P2 二期再上</span></td>
       </tr>
       <tr>
         <td><span class="res-icon">▸</span>Skill 沉淀</td>
         <td>把用户高频改稿动作攒成可复用的 skill，下次一键</td>
-        <td>Skill 中心 · 用于"AI 帮我改"</td>
         <td><span class="res-prio p2">P2 二期再上</span></td>
       </tr>
     </tbody>
@@ -2264,7 +2387,7 @@
         const WORKER_BASE = 'https://1406195631-ft345q04pn.ap-guangzhou.tencentscf.com';
 
         // 仅 AI 改稿密钥（deepseek API key）保留密码加密存储——deepseek key 暴露不会被自动 revoke
-        const ENCRYPTED_KEYS = 'ekTLzvGlaaofhf8uQcdk0UmZYatJ5TXb57AMrI0O6G0h9q3tKa1ghDKwjX1RYK9deBDa8QeJb8rWej+VcXgGoFtQCsafVq2PxkkAN2l0SFOzQiDI8Ec=';
+        const ENCRYPTED_KEYS = '0fog0A5lEVlK1MBkjpVb++umPb8Zqz76Xs3ukG9CulI9O5tYtio/14lHST3SQ6zvb+poDhb2369eAkuOTcGnTW8fMYx5/s1J1Zx/tfOVj8loQZMdaZQ=';
 
         let _cachedKeys = null;
         async function ensureKeys() {
@@ -3401,6 +3524,95 @@
         // v2.11.2：手机端评论卡片（底部抽屉，单元素 list+输入）
         // ===================================================================
         let mobileCardTarget = null; // 当前卡片绑定的 target 元素
+
+        // === v5.12：图片/SVG 全屏放大预览（手机批注/只读都可用，PC 也可用） ===
+        function _ensureImgZoomOverlay() {
+            let ov = document.getElementById('imgZoomOverlay');
+            if (ov) return ov;
+            ov = document.createElement('div');
+            ov.id = 'imgZoomOverlay';
+            ov.innerHTML = `
+                <button type="button" class="zoom-close" aria-label="关闭">✕</button>
+                <div class="zoom-canvas" id="zoomCanvas"></div>
+                <div class="zoom-hint">点击空白处关闭 · 双指缩放浏览</div>
+            `;
+            document.body.appendChild(ov);
+            ov.querySelector('.zoom-close').addEventListener('click', (e) => {
+                e.preventDefault(); e.stopPropagation();
+                closeImgZoom();
+            });
+            ov.addEventListener('click', (e) => {
+                // 点空白关闭
+                if (e.target === ov || e.target.id === 'zoomCanvas') closeImgZoom();
+            });
+            return ov;
+        }
+        function openImgZoom(sourceEl) {
+            const ov = _ensureImgZoomOverlay();
+            const canvas = ov.querySelector('#zoomCanvas');
+            canvas.innerHTML = '';
+            // 克隆一份显示，避免破坏原 DOM 的事件
+            let clone;
+            if (sourceEl.tagName === 'IMG') {
+                clone = sourceEl.cloneNode(true);
+                clone.style.maxWidth = '100%';
+                clone.style.maxHeight = '100%';
+                clone.style.width = 'auto';
+                clone.style.height = 'auto';
+                clone.style.objectFit = 'contain';
+            } else {
+                // SVG 容器/div：直接深克隆
+                clone = sourceEl.cloneNode(true);
+                clone.style.maxWidth = 'min(96vw, 1200px)';
+                clone.style.maxHeight = '90vh';
+                clone.style.width = 'auto';
+                clone.style.background = sourceEl.tagName === 'svg' ? 'transparent' : '#fff';
+                clone.style.padding = '20px';
+                clone.style.borderRadius = '12px';
+                clone.style.cursor = 'auto';
+                // 让内部 SVG 自适应放大
+                clone.querySelectorAll('svg').forEach(svg => {
+                    svg.style.width = '100%';
+                    svg.style.height = 'auto';
+                    svg.style.maxHeight = '80vh';
+                });
+                if (clone.tagName === 'svg' || clone.tagName === 'SVG') {
+                    clone.style.width = '100%';
+                    clone.style.height = 'auto';
+                }
+            }
+            canvas.appendChild(clone);
+            ov.classList.add('show');
+            document.body.style.overflow = 'hidden'; // 锁背景滚动
+        }
+        function closeImgZoom() {
+            const ov = document.getElementById('imgZoomOverlay');
+            if (!ov) return;
+            ov.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+        // ESC 关闭
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const ov = document.getElementById('imgZoomOverlay');
+                if (ov && ov.classList.contains('show')) closeImgZoom();
+            }
+        });
+        // 全局点击委托：手机视图下「只读模式」点击 force-vis / pillars-hero / flywheel 容器（带 SVG 的图）→ 放大
+        // 批注模式下不放大，让评论流程接管
+        document.addEventListener('click', (e) => {
+            const isMobile = document.body.classList.contains('mobile-view');
+            if (!isMobile) return;
+            const showComments = document.body.classList.contains('show-comments');
+            if (showComments) return; // 批注态优先评论
+            // 不要拦截弹窗
+            if (e.target.closest('#mobileQuickInput, #imgZoomOverlay, #initDialog, #pwdDialog, #inputDialog, #commentPanel, #bubbleToolbar, #bubbleInput, .view-switcher, .panel-tab, .view-btn, button')) return;
+            const zoomable = e.target.closest('.force-vis, .pillars-hero, .flywheel, .scene-funnel, img.zoomable, .zoomable');
+            if (!zoomable) return;
+            e.preventDefault();
+            e.stopPropagation();
+            openImgZoom(zoomable);
+        }, true);
 
         // === v5.4：手机视图气泡——既能看已有评论列表（与PC同源 Gist），又能直接写新评论 ===
         function _ensureMobileQuickInputDOM() {
