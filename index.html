@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <!-- mobile-readability-v5.12 build:20260512-234500 tables-and-zoom -->
+    <!-- mobile-readability-v5.13 build:20260513-105800 cover-user-perspective -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
@@ -1500,10 +1500,10 @@
 <!-- ========== 封面 ========== -->
 <section class="cover commentable" data-section="cover">
   <div class="cover-label">QQ 浏览器 · 元宝助手二期 · 二次编辑</div>
-  <h1>把元宝生成的内容<br/>变成<span>用户能用上的产出</span></h1>
+  <h1>在浏览器里看到的<br/><span>都能直接改成你要的</span></h1>
   <p class="cover-sub">
-    元宝把 AI 内容生成出来，浏览器要让它<b style="color:#FFD666;">改得了、留得住、带得走</b>。<br/>
-    生成不是终点——用户看完想改的那一刻，才是浏览器接住元宝的位置。AI 越强，用户越需要这一步。
+    AI 生成的图文、抽取出来的内容、网页上的任何元素——<b style="color:#FFD666;">看到了不顺眼，原地改、留得住、带得走</b>。<br/>
+    生成只是开始，"看完想再改一下"才是用户的真实诉求。AI 越强，用户越需要这一步——浏览器是离用户最近的那个。
   </p>
 </section>
 
@@ -1853,12 +1853,12 @@
   <div class="statement">
     <div class="statement-label">PROJECT STATEMENT</div>
     <div class="statement-text">
-      给元宝生成的 AI 内容<br/>
-      接上 <span class="k">"看 → 改 → 用"</span> 的下半场<br/>
-      <span style="font-size: 22px; opacity: .9;">让"看完想改"那一刻，浏览器是离用户最近的那个</span>
+      用户在浏览器里看到的任何东西<br/>
+      都能 <span class="k">"看 → 改 → 用"</span> 一步打通<br/>
+      <span style="font-size: 22px; opacity: .9;">不用切走、不用截图、不用从头再来</span>
     </div>
     <div class="statement-foot">
-      AI 越强，用户对"在原稿上微调"的诉求越强——不做这一步，AI 内容只是一次性消耗品。
+      AI 越强，用户越想"在已经看到的东西上微调一下"——不做这一步，AI 给出的内容用完即丢。
     </div>
   </div>
 </section>
@@ -2387,7 +2387,7 @@
         const WORKER_BASE = 'https://1406195631-ft345q04pn.ap-guangzhou.tencentscf.com';
 
         // 仅 AI 改稿密钥（deepseek API key）保留密码加密存储——deepseek key 暴露不会被自动 revoke
-        const ENCRYPTED_KEYS = '0fog0A5lEVlK1MBkjpVb++umPb8Zqz76Xs3ukG9CulI9O5tYtio/14lHST3SQ6zvb+poDhb2369eAkuOTcGnTW8fMYx5/s1J1Zx/tfOVj8loQZMdaZQ=';
+        const ENCRYPTED_KEYS = 'Lbbe71bQrpBvchQt+Gy70MJ9DMxRMY3VgIP7iqS/jbehdG843xJffpzZfAsJz7dlFr7pQj867iUtzBRXyE5miKAnbStxXJRSpfOeLgGcRKZW1c7n8+w=';
 
         let _cachedKeys = null;
         async function ensureKeys() {
